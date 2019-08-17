@@ -1,10 +1,13 @@
 dist: trusty
 
+services:
+  - docker
+
 jobs:
   include:
     - stage: build docker image
       script:
-      - docker login -e $DOCKER_EMAIL -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
+      - docker login -u "$DOCKER_USER" -p "$DOCKER_PASSWORD"
       - docker build -t $DOCKER_IMAGE_TAG .
       - docker images
       - docker tag $DOCKER_IMAGE_TAG $DOCKER_USER/$DOCKER_IMAGE_TAG
