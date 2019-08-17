@@ -1,0 +1,4 @@
+lxml
+nameparser
+pymongo
+regex
