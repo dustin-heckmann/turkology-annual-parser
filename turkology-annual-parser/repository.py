@@ -7,6 +7,7 @@ import pymongo
 class MongoRepository(object):
     def __init__(self, host=None, port=None, db=None):
         database = pymongo.MongoClient(host, port)[db]
+        logging.info({'host': host, 'port': port, 'db': db})
         self.paragraphs = database['paragraphs']
         self.citations = database['citations']
         self._create_indexes()
