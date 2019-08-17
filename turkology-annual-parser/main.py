@@ -27,7 +27,7 @@ def main():
 
     setup_logging(args.verbose)
 
-    repository = MongoRepository(host=os.getenv('MONGODB_HOST'), db=os.getenv('MONGODB_DATABASE'))
+    repository = create_repository()
     if args.full:
         run_full_pipeline(args.ocr_files, args.keyword_file, repository)
 
@@ -63,6 +63,11 @@ def main():
                 repository.insert_citation(citation)
 
 
+def create_repository():
+    repository = MongoRepository(host=os.getenv('MONGODB_HOST'), db=os.getenv('MONGODB_DATABASE'))
+    return repository
+
+
 def run_full_pipeline(ocr_files, keyword_file, repository, drop_existing=True):
     keyword_mapping = get_keyword_mapping(keyword_file)
     if drop_existing:
@@ -85,7 +90,7 @@ def run_full_pipeline_on_volume(volume_filename, keyword_mapping):
         paragraph['styles'] = list(paragraph['styles'].items())
 
     logging.debug('Connecting to database...')
-    repository = MongoRepository(host='localhost', db='ta')
+    repository = create_repository()
 
     logging.debug('Writing paragraphs to database...')
     repository.insert_paragraphs(typed_paragraphs)
