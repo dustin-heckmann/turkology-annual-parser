@@ -8,6 +8,7 @@ from datetime import datetime
 from citation import keywords
 from citation.assembly import assemble_citations
 from citation.citation_parsing import CitationParser
+from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
 from repetitions import add_repeated_info
@@ -78,11 +79,13 @@ def run_full_pipeline(ocr_files, keyword_file, repository, drop_existing=True):
 
 
 def run_full_pipeline_on_volume(volume_filename, keyword_mapping):
-    parser = CitationParser()
     logging.info("START: %s", volume_filename)
 
     logging.debug('Extracting paragraphs...')
-    paragraphs = extract_paragraphs(volume_filename)
+    paragraphs = list(extract_paragraphs(volume_filename))
+
+    logging.debug('Performing paragraph corrections...')
+    paragraphs = correct_paragraphs(paragraphs)
 
     logging.debug('Determining paragraph types...')
     typed_paragraphs = list(detect_paragraph_types(paragraphs, keyword_mapping))
@@ -97,6 +100,7 @@ def run_full_pipeline_on_volume(volume_filename, keyword_mapping):
     raw_citations = assemble_citations(typed_paragraphs)
 
     logging.debug('Parsing citations...')
+    parser = CitationParser()
     citations = [parser.parse_citation(raw_citation) for raw_citation in raw_citations]
 
     citations = [keywords.normalize_keywords_for_citation(citation, keyword_mapping) for citation in citations]

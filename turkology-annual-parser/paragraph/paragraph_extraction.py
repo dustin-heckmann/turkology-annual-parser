@@ -9,9 +9,6 @@ def extract_paragraphs(volume_filename):
         volume_number = str(int(volume_number))
 
     parser = WMLParser(volume_filename)
-    paragraph_index = 0
     for paragraph in parser.paragraphs:
         paragraph['volume'] = volume_number
-        paragraph['index'] = paragraph_index
         yield paragraph
-        paragraph_index += 1
