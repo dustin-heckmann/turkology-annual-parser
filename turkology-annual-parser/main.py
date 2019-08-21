@@ -86,8 +86,6 @@ def run_full_pipeline_on_volume(volume_filename, keyword_mapping):
 
     logging.debug('Determining paragraph types...')
     typed_paragraphs = list(detect_paragraph_types(paragraphs, keyword_mapping))
-    for paragraph in typed_paragraphs:
-        paragraph['styles'] = list(paragraph['styles'].items())
 
     logging.debug('Connecting to database...')
     repository = create_repository()
