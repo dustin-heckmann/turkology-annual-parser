@@ -65,7 +65,11 @@ def main():
 
 
 def create_repository():
-    repository = MongoRepository(host=os.getenv('MONGODB_HOST'), db=os.getenv('MONGODB_DATABASE'))
+    repository = MongoRepository(
+        host=os.getenv('MONGODB_HOST'),
+        port= os.getenv('MONOGODB_PORT'),
+        db=os.getenv('MONGODB_DATABASE')
+    )
     return repository
 
 
