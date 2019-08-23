@@ -167,7 +167,7 @@ class CitationParser(object):
                                    multiple_authors_match.group().split(multiple_authors_match.group(1))]
             text = '{{{ authors }}} ' + text[multiple_authors_match.span()[1]:].strip()
 
-        if citation['volume'] == 1:
+        if citation['volume'] == '1':
             author_match = cls.author_pattern_volume_1.search(text)
         else:
             author_match = cls.author_pattern.search(text)
