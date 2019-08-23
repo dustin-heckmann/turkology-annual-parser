@@ -9,6 +9,8 @@ def correct_paragraphs(paragraphs):
         del paragraphs[3089]
     elif volume == '3':
         paragraphs = paragraphs[:700] + [merge_paragraphs(paragraphs[701:707])] + paragraphs[707:]
+    elif volume == '11':
+        paragraphs = paragraphs[:2947] + [merge_paragraphs(paragraphs[2947:2950])] + paragraphs[2950:]
     return paragraphs
 
 
