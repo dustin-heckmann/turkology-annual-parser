@@ -1,5 +1,19 @@
 import regex as re
 
+MAX_CITATION_GAP = 500
+
+KNOWN_CITATION_GAPS_BY_VOLUME = {  # Ranges are inclusive
+    '6': (
+        (1823, 1831),
+        (1871, 1883),
+        (1894, 1902),
+    ),
+    '8': (
+        (607, 617),
+        (629, 638),
+    )
+}
+
 
 def detect_paragraph_types(paragraphs, keyword_mapping):
     journal_section_begin_pattern = re.compile('ZEITSCHRIFTEN +UND')
@@ -47,8 +61,10 @@ def detect_paragraph_types(paragraphs, keyword_mapping):
         if citation_section_has_begun and not index_has_begun:
             if keyword_pattern_exact.fullmatch(text):
                 paragraph_type = 'keyword'
-            elif citation_section_has_begun and citation_match and 0 < (
-                    int(citation_match.group(1)) - latest_citation_number) <= 500:
+            elif citation_section_has_begun and citation_match and (
+                    0 < (int(citation_match.group(1)) - latest_citation_number) <= MAX_CITATION_GAP
+                    or _is_preceded_by_ocr_gap(paragraph['volume'], int(citation_match.group(1)))
+            ):
                 paragraph_type = 'citation'
                 latest_citation_number = int(citation_match.group(1))
             elif keyword_pattern_fuzzy.fullmatch(text):
@@ -66,8 +82,17 @@ def detect_paragraph_types(paragraphs, keyword_mapping):
                 index_has_begun = True
             elif broken_bullet_pattern.match(text) and is_possible_amendment:
                 paragraph_type = 'amendment'
-
+            elif citation_section_has_begun and citation_match:
+                paragraph_type = 'citation'
+                latest_citation_number = int(citation_match.group(1))
         paragraph['type'] = paragraph_type
         yield paragraph
         if not page_number_pattern.fullmatch(text):
             previous_type = paragraph_type
+
+
+def _is_preceded_by_ocr_gap(volume, number):
+    for _, range_end in KNOWN_CITATION_GAPS_BY_VOLUME.get(volume, ()):
+        if number == range_end + 1:
+            return True
+    return False
