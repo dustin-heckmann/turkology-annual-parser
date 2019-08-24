@@ -67,6 +67,8 @@ def correct_paragraphs(paragraphs):
         paragraphs = paragraphs[:461] + [merge_paragraphs([paragraphs[461], paragraphs[465]])] + paragraphs[462:465] + paragraphs[466:]
     elif volume == '11':
         paragraphs = paragraphs[:2947] + [merge_paragraphs(paragraphs[2947:2950])] + paragraphs[2950:]
+    elif volume == '19':
+        paragraphs[3081] = replace_text('^Î48L', '1481', paragraphs[3081])
     return paragraphs
 
 
