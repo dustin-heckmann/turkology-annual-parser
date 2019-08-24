@@ -75,7 +75,7 @@ def correct_paragraphs(paragraphs):
             paragraphs[2950:2979],
             [replace_text(r'^\.1561', '1561', paragraphs[2979])],
             paragraphs[2980:3822],
-            [replace_text(r'^j2Ö6|', '2061', paragraphs[3822])],
+            [replace_text(r'^j2Ö6\|', '2061.', paragraphs[3822])],
             paragraphs[3823:],
         ])
     elif volume == '19':
