@@ -66,7 +66,18 @@ def correct_paragraphs(paragraphs):
     elif volume == '10':
         paragraphs = paragraphs[:461] + [merge_paragraphs([paragraphs[461], paragraphs[465]])] + paragraphs[462:465] + paragraphs[466:]
     elif volume == '11':
-        paragraphs = paragraphs[:2947] + [merge_paragraphs(paragraphs[2947:2950])] + paragraphs[2950:]
+        paragraphs = flatten_list([
+            paragraphs[:649],
+            [replace_text(r'^\^209', '209', paragraphs[649])],
+            split_paragraph_before(paragraphs[650], '210. Gil Grim'),
+            paragraphs[651:2947],
+            [merge_paragraphs(paragraphs[2947:2950])],
+            paragraphs[2950:2979],
+            [replace_text(r'^\.1561', '1561', paragraphs[2979])],
+            paragraphs[2980:3822],
+            [replace_text(r'^j2Ö6|', '2061', paragraphs[3822])],
+            paragraphs[3823:],
+        ])
     elif volume == '19':
         paragraphs[3081] = replace_text('^Î48L', '1481.', paragraphs[3081])
     return paragraphs
