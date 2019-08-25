@@ -71,7 +71,38 @@ def correct_paragraphs(paragraphs):
             [replace_text(r'^lóét\)', '1376', paragraphs[2668])],
             paragraphs[2669:2675],
             [replace_text(r'^« +', '', paragraphs[2675])],
-            paragraphs[2676:]
+            paragraphs[2676:2970],
+            [replace_text(r'^\. ', '', paragraphs[2970])],
+            paragraphs[2971:4123],
+            [replace_text(r'^2196:', '2196.', paragraphs[4123])],
+            paragraphs[4124:]
+        ])
+    elif volume == '8':
+        paragraphs = flatten_list([
+            paragraphs[:2381],
+            split_paragraph_before(
+                replace_text(r'İ230\.', '1230.', paragraphs[2381]),
+                '1230.'
+            ),
+            paragraphs[2382:2416],
+            [replace_text('^1250verol', '1250. Erol', paragraphs[2416])],
+            paragraphs[2417:2557],
+            split_paragraph_before(
+                replace_text(r'^.+laque ur', '1330. Laqueur', paragraphs[2557]),
+                '1331.'
+            ),
+            paragraphs[2558:3749],
+            [replace_text(r'^.+?3\.', '2083.', paragraphs[3749])],
+            paragraphs[3750:]
+        ])
+    elif volume == '9':
+        paragraphs = flatten_list([
+            paragraphs[:980],
+            [replace_text(r"^' ", '', paragraphs[980])],
+            paragraphs[981:3350],
+            split_paragraph_before(paragraphs[3350], '1605.'),
+            split_paragraph_before(paragraphs[3351], '1606.'),
+            paragraphs[3352:]
         ])
     elif volume == '10':
         paragraphs = flatten_list([
