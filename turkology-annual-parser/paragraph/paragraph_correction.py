@@ -64,7 +64,49 @@ def correct_paragraphs(paragraphs):
         ]
         )
     elif volume == '10':
-        paragraphs = paragraphs[:461] + [merge_paragraphs([paragraphs[461], paragraphs[465]])] + paragraphs[462:465] + paragraphs[466:]
+        paragraphs = flatten_list([
+            paragraphs[:461],
+            [merge_paragraphs([paragraphs[461], paragraphs[465]])],
+            paragraphs[462:465],
+            paragraphs[466:2032],
+            [replace_text('^895.0y', '895. Oy', paragraphs[2032])],
+            paragraphs[2033:3339],
+            [replace_text('^\\\\ 1609', '1609', paragraphs[3339])],
+            paragraphs[3340:4275],
+            split_paragraph_before(
+                paragraphs[4275],
+                '2161. Denham'
+            ),
+            paragraphs[4276:4775],
+            [replace_text(
+                r'Die 7.+?edenk', 'Die Gedenk',
+                replace_text(r'^.+?461', '2461', paragraphs[4775])
+            )],
+            [replace_text(
+                r'^.+$',
+                '• Geheimverträge über die Aufteilung des Osmanischen Reiches, s. 628.',
+                paragraphs[4776]
+            )],
+            [replace_text(
+                r'^í    f    · Die Wirkung der Persönlichkeit Atatürks in der Dritten Welt, s. V ,>        ',
+                '• Die Wirkung der Persönlichkeit Atatürks in der Dritten Welt, s.',
+                paragraphs[4777]
+            )],
+            split_paragraph_before(
+                replace_text(r'^.+?462\.', '• Der Einfluß der osmanischen Kalligraphie in Europa, s. 2107 2462.', paragraphs[4778]),
+                '2462.'
+            ),
+            paragraphs[4779:4837],
+            [replace_text('^• 2505', '2505', paragraphs[4837])],
+            paragraphs[4838:4844],
+            [replace_text(
+                'russi- sehe',
+                'russische',
+                merge_paragraphs([paragraphs[4844], paragraphs[4848]])
+            )],
+            paragraphs[4845:4848],
+            paragraphs[4849:]
+        ])
     elif volume == '11':
         paragraphs = flatten_list([
             paragraphs[:649],
