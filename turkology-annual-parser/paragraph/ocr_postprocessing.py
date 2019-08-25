@@ -2,7 +2,7 @@
 
 import regex as re
 
-broken_bullet_pattern = re.compile('^[φ#0]\s+', re.UNICODE)
+broken_bullet_pattern = re.compile('^[φ#0Φ]\s+', re.UNICODE)
 
 
 def postprocess_paragraph(paragraph):

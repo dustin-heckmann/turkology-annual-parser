@@ -27,7 +27,7 @@ def detect_paragraph_types(paragraphs, keyword_mapping):
     keyword_pattern_exact = re.compile(keyword_pattern_base, re.IGNORECASE)
     keyword_pattern_fuzzy = re.compile(keyword_pattern_base + '{e<=2}', re.IGNORECASE)
     citation_pattern = re.compile(r'(\d+)\.\.?\s+.+', re.DOTALL)
-    broken_bullet_pattern = re.compile(r'^[φ#0].*')  # , s\.( a\.)? \d+')
+    broken_bullet_pattern = re.compile(r'^[φ#0Φ].*')  # , s\.( a\.)? \d+')
     page_number_pattern = re.compile('(\d+\s+Turkologischer Anzeiger|Turkologischer Anzeiger\s+\d+){e<=2}')
 
     citation_section_has_begun = False
