@@ -121,6 +121,27 @@ def correct_paragraphs(paragraphs):
             [replace_text(r'^j2Ö6\|', '2061.', paragraphs[3822])],
             paragraphs[3823:],
         ])
+    elif volume == '16':
+        paragraphs = flatten_list([
+            paragraphs[:349],
+            [replace_text(
+                '^I.\t.',
+                '1. ',
+                merge_paragraphs(paragraphs[349:351])
+            )],
+            paragraphs[351:361],
+            [replace_text('^II.\t', '11. ', paragraphs[361])],
+            paragraphs[361:463],
+            split_paragraph_before(
+                replace_text(
+                    '70.. TARDY',
+                    '70.\tTARDY',
+                    merge_paragraphs(paragraphs[463:465])
+                ),
+                '70.'
+            ),
+            paragraphs[465:]
+        ])
     elif volume == '19':
         paragraphs[3081] = replace_text('^Î48L', '1481.', paragraphs[3081])
     elif volume == '21':
@@ -141,6 +162,25 @@ def correct_paragraphs(paragraphs):
                 paragraphs[2617]
             )],
             paragraphs[2618:]
+        ])
+    elif volume == '22-23':
+        paragraphs = flatten_list([
+            paragraphs[:1161],
+            [replace_text('^542·', '542.', paragraphs[1161])],
+            paragraphs[1162:4663],
+            [replace_text('^ι 2615', '2615', paragraphs[4663])],
+            paragraphs[4664:6084],
+            paragraphs[6124:]
+        ])
+    elif volume == '24':
+        paragraphs = flatten_list([
+            paragraphs[:726],
+            [replace_text(' 262;.*', '', merge_paragraphs(paragraphs[726:729]))],
+            [replace_text('^.+?262;', '262.', merge_paragraphs(paragraphs[728:731]))],
+            paragraphs[731:786],
+            split_paragraph_before(paragraphs[786], '290.'),
+            paragraphs[787:]
+            # TODO: Continueg
         ])
     elif volume == '25':
         paragraphs = flatten_list([
