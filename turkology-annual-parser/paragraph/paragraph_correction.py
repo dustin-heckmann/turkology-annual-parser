@@ -17,7 +17,7 @@ def split_paragraph_before(paragraph, split_str):
         return [paragraph]
 
     def create_paragraph(text):
-        return dict(**paragraph, splitFrom=paragraph['originalIndex'], text=text)
+        return dict(**paragraph, text=text)
 
     return [
         create_paragraph(text=text[:split_index]),
@@ -123,6 +123,25 @@ def correct_paragraphs(paragraphs):
         ])
     elif volume == '19':
         paragraphs[3081] = replace_text('^Î48L', '1481.', paragraphs[3081])
+    elif volume == '21':
+        paragraphs = flatten_list([
+            paragraphs[:2180],
+            split_paragraph_before(
+                replace_text(
+                    '#',
+                    '',
+                    merge_paragraphs(paragraphs[2180:2182]),
+                ),
+                '989.'
+            ),
+            paragraphs[2182:2617],
+            replace_text(
+                '^12Ì0',
+                '1210',
+                paragraphs[2617]
+            ),
+            paragraphs[2618:]
+        ])
     elif volume == '25':
         paragraphs = flatten_list([
             paragraphs[:3771],
@@ -139,7 +158,6 @@ def correct_paragraphs(paragraphs):
 
 def merge_paragraphs(paragraphs):
     return {
-        'mergedFrom': list(map(itemgetter('originalIndex'), paragraphs)),
         'volume': paragraphs[0]['volume'],
         'text': ' '.join(map(itemgetter('text'), paragraphs)),
     }
