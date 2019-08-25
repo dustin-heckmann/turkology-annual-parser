@@ -63,6 +63,16 @@ def correct_paragraphs(paragraphs):
             paragraphs[1969:]
         ]
         )
+    elif volume == '7':
+        paragraphs = flatten_list([
+            paragraphs[:2446],
+            [replace_text('^.1245. LlU', '1245. Liu', paragraphs[2446])],
+            paragraphs[2447:2668],
+            [replace_text(r'^lóét\)', '1376', paragraphs[2668])],
+            paragraphs[2669:2675],
+            [replace_text(r'^« +', '', paragraphs[2675])],
+            paragraphs[2676:]
+        ])
     elif volume == '10':
         paragraphs = flatten_list([
             paragraphs[:461],
@@ -179,8 +189,25 @@ def correct_paragraphs(paragraphs):
             [replace_text('^.+?262;', '262.', merge_paragraphs(paragraphs[728:731]))],
             paragraphs[731:786],
             split_paragraph_before(paragraphs[786], '290.'),
-            paragraphs[787:]
-            # TODO: Continueg
+            paragraphs[787:2817],
+            [replace_text('1535;.+$', '', paragraphs[2817])],
+            [replace_text('^.+1535;', '1535.', paragraphs[2817])],
+            paragraphs[2818:4497],
+            split_paragraph_before(
+                replace_text(
+                    '^2516;', '2516.',
+                    merge_paragraphs(paragraphs[4497:4501])
+                ),
+                '2517.'
+            ),
+            paragraphs[4501:4627],
+            [replace_text('^2588;', '2588.', paragraphs[4627])],
+            [paragraphs[4628]],
+            [replace_text('^2589;', '2589.', paragraphs[4629])],
+            paragraphs[4630:4911],
+            [replace_text('^llľò. yusuf Has HacÍB', '2773. Yusuf Has Hacib', paragraphs[4911])],
+            split_paragraph_before(paragraphs[4912], '2774.'),
+            paragraphs[4913:]
         ])
     elif volume == '25':
         paragraphs = flatten_list([
