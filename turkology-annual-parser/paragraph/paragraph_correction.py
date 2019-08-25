@@ -135,11 +135,11 @@ def correct_paragraphs(paragraphs):
                 '989.'
             ),
             paragraphs[2182:2617],
-            replace_text(
+            [replace_text(
                 '^12Ì0',
                 '1210',
                 paragraphs[2617]
-            ),
+            )],
             paragraphs[2618:]
         ])
     elif volume == '25':
