@@ -93,7 +93,8 @@ def correct_paragraphs(paragraphs):
                 paragraphs[4777]
             )],
             split_paragraph_before(
-                replace_text(r'^.+?462\.', '• Der Einfluß der osmanischen Kalligraphie in Europa, s. 2107 2462.', paragraphs[4778]),
+                replace_text(r'^.+?462\.', '• Der Einfluß der osmanischen Kalligraphie in Europa, s. 2107 2462.',
+                             paragraphs[4778]),
                 '2462.'
             ),
             paragraphs[4779:4837],
@@ -122,6 +123,17 @@ def correct_paragraphs(paragraphs):
         ])
     elif volume == '19':
         paragraphs[3081] = replace_text('^Î48L', '1481.', paragraphs[3081])
+    elif volume == '25':
+        paragraphs = flatten_list([
+            paragraphs[:3771],
+            [merge_paragraphs([
+                paragraphs[3771],
+                replace_text('1992\..*', '', paragraphs[3775])
+            ])],
+            paragraphs[3772:3775],
+            [replace_text(r'^.+?1992\.', '1992.', paragraphs[3775])],
+            paragraphs[3776:]
+        ])
     return paragraphs
 
 
