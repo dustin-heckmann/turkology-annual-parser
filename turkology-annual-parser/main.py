@@ -12,7 +12,7 @@ from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
 from repetitions import add_repeated_info
-from repository import MongoRepository
+from repositories.MongoRepository import MongoRepository
 
 
 def main():
@@ -33,11 +33,10 @@ def main():
         run_full_pipeline(args.ocr_files, args.keyword_file, repository)
 
     if args.find_authors:
-        known_authors = set(
-            [author.strip().lower() for author in repository.citations.distinct('authors.raw') if author])
+        known_authors = repository.distinct_author_names
         logging.info('Found {} distinct authors'.format(len(known_authors)))
         logging.debug(list(known_authors)[:10])
-        citations = repository.citations.find({'authors': None, 'fullyParsed': False, '_obsolete': {'$ne': True}})
+        citations = repository.citations_with_missing_author()
         parser = CitationParser()
         count = -1
         for count, updated_citation in enumerate(parser.find_known_authors(citations, known_authors)):
@@ -52,7 +51,7 @@ def main():
 
     if args.resolve_repetitions:
         logging.info('Resolving repetitions...')
-        citations = list(repository.citations.find({'_obsolete': {'$ne': True}}))
+        citations = list(repository.all_citations())
         print(len(citations))
         add_repeated_info(citations)
         for citation in citations:
@@ -66,9 +65,9 @@ def main():
 
 def create_repository():
     repository = MongoRepository(
-        host=os.getenv('MONGODB_HOST'),
-        port= os.getenv('MONOGODB_PORT'),
-        db=os.getenv('MONGODB_DATABASE')
+        host=os.getenv('MONGODB_HOST', 'localhost'),
+        port=os.getenv('MONOGODB_PORT', 27017),
+        db=os.getenv('MONGODB_DATABASE', 'turkology')
     )
     return repository
 
@@ -76,7 +75,7 @@ def create_repository():
 def run_full_pipeline(ocr_files, keyword_file, repository, drop_existing=True):
     keyword_mapping = get_keyword_mapping(keyword_file)
     if drop_existing:
-        repository.drop_database()
+        repository.delete_all_data()
 
     with multiprocessing.Pool() as pool:
         pool.starmap(run_full_pipeline_on_volume, [(volume_filename, keyword_mapping) for volume_filename in ocr_files])
