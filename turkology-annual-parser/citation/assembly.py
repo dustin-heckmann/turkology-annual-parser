@@ -19,7 +19,7 @@ def assemble_citations(paragraphs):
                 keywords=[current_keyword],
                 rawText=paragraph['text'],
                 _version=1,
-                _timestamp=datetime.now(),
+                _last_modified=datetime.now(),
                 _creator='<initial>',
             )
         elif paragraph['type'] and paragraph['type'] == 'amendment':

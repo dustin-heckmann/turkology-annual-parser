@@ -4,6 +4,7 @@ import logging
 import multiprocessing
 import os
 from datetime import datetime
+from typing import Dict, List
 
 from citation import keywords
 from citation.assembly import assemble_citations
@@ -12,7 +13,9 @@ from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
 from repetitions import add_repeated_info
+from repositories.ElasticSearchRepository import ElasticSearchRepository
 from repositories.MongoRepository import MongoRepository
+from repositories.Repository import Repository
 
 
 def main():
@@ -32,56 +35,73 @@ def main():
     if args.full:
         run_full_pipeline(args.ocr_files, args.keyword_file, repository)
 
-    if args.find_authors:
-        known_authors = repository.distinct_author_names
-        logging.info('Found {} distinct authors'.format(len(known_authors)))
-        logging.debug(list(known_authors)[:10])
-        citations = repository.citations_with_missing_author()
-        parser = CitationParser()
-        count = -1
-        for count, updated_citation in enumerate(parser.find_known_authors(citations, known_authors)):
-            if updated_citation.get('authors'):
-                updated_citation = parser.parse_citation(updated_citation)
-                updated_citation['_timestamp'] = datetime.now()
-                updated_citation['_version'] = updated_citation.get('_version', 0) + 1
-                updated_citation['_creator'] = '<find_known_authors>'
-                logging.debug('Found author(s) "{}" in "{}"\n'.format(updated_citation['authors'], updated_citation))
-                repository.insert_citation(updated_citation)
-        logging.info('Found known authors in %d citations', count + 1)
-
-    if args.resolve_repetitions:
-        logging.info('Resolving repetitions...')
-        citations = list(repository.all_citations())
-        print(len(citations))
-        add_repeated_info(citations)
-        for citation in citations:
-            if citation.get('_added_repetition'):
-                citation['_version'] = citation.get('_version', 0) + 1
-                citation['_timestamp'] = datetime.now()
-                citation['_creator'] = '<resolve_repetitions>'
-                del citation['_added_repetition']
-                repository.insert_citation(citation)
+    args.find_authors and find_authors(repository)
+    args.resolve_repetitions and resolve_repetitions(repository)
+    # write_to_elastic(repository)
 
 
-def create_repository():
-    repository = MongoRepository(
+def find_authors(repository: Repository):
+    known_authors = repository.distinct_author_names()
+    logging.info('Found {} distinct authors'.format(len(known_authors)))
+    logging.debug(list(known_authors)[:10])
+    citations = repository.citations_with_missing_author()
+    parser = CitationParser()
+    count = -1
+    for count, updated_citation in enumerate(parser.find_known_authors(citations, known_authors)):
+        if updated_citation.get('authors'):
+            updated_citation = parser.parse_citation(updated_citation)
+            updated_citation['_timestamp'] = datetime.now()
+            updated_citation['_version'] = updated_citation.get('_version', 0) + 1
+            updated_citation['_creator'] = '<find_known_authors>'
+            logging.debug('Found author(s) "{}" in "{}"\n'.format(updated_citation['authors'], updated_citation))
+            repository.insert_citation(updated_citation)
+    logging.info('Found known authors in %d citations', count + 1)
+
+
+def resolve_repetitions(repository: Repository):
+    logging.info('Resolving repetitions...')
+    citations = list(repository.all_citations())
+    print(len(citations))
+    add_repeated_info(citations)
+    for citation in citations:
+        if citation.get('_added_repetition'):
+            citation['_version'] = citation.get('_version', 0) + 1
+            citation['_timestamp'] = datetime.now()
+            citation['_creator'] = '<resolve_repetitions>'
+            del citation['_added_repetition']
+            repository.insert_citation(citation)
+
+
+def write_to_elastic(repository: Repository):
+    elastic = ElasticSearchRepository()
+    elastic.delete_all_data()
+    elastic.insert_citations(repository.all_citations())
+
+
+def create_repository() -> Repository:
+    return MongoRepository(
         host=os.getenv('MONGODB_HOST', 'localhost'),
         port=os.getenv('MONOGODB_PORT', 27017),
         db=os.getenv('MONGODB_DATABASE', 'turkology')
     )
-    return repository
 
 
-def run_full_pipeline(ocr_files, keyword_file, repository, drop_existing=True):
+def run_full_pipeline(
+        ocr_files: List[str],
+        keyword_file: str,
+        repository: Repository,
+        drop_existing: bool = True
+):
     keyword_mapping = get_keyword_mapping(keyword_file)
     if drop_existing:
         repository.delete_all_data()
 
     with multiprocessing.Pool() as pool:
         pool.starmap(run_full_pipeline_on_volume, [(volume_filename, keyword_mapping) for volume_filename in ocr_files])
+    pool.close()
 
 
-def run_full_pipeline_on_volume(volume_filename, keyword_mapping):
+def run_full_pipeline_on_volume(volume_filename: str, keyword_mapping: Dict[str, List[str]]):
     logging.info("START: %s", volume_filename)
 
     logging.debug('Extracting paragraphs...')
@@ -110,21 +130,20 @@ def run_full_pipeline_on_volume(volume_filename, keyword_mapping):
 
     if citations:
         logging.debug('Writing {} citations to database...'.format(len(citations)))
-
         repository.insert_citations(citations)
     else:
         logging.warning('No citations found in %s.', volume_filename)
     logging.info('DONE: %s', volume_filename)
 
 
-def get_keyword_mapping(file_name):
+def get_keyword_mapping(file_name: str) -> Dict[str, List[str]]:
     with open(file_name, encoding='utf-8') as keyword_file:
         reader = csv.reader(keyword_file, delimiter=';', quotechar='"')
         keyword_mapping = {code: [name_de, name_en] for (code, name_de, name_en) in reader}
         return keyword_mapping
 
 
-def setup_logging(verbose):
+def setup_logging(verbose: bool):
     # set up logging to file - see previous section for more details
     logging.basicConfig(level=logging.DEBUG,
                         format='%(asctime)s %(processName)s %(levelname)-8s %(message)s',
