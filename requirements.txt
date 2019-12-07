@@ -1,4 +1,6 @@
-lxml
-nameparser
-pymongo
-regex
+elasticsearch==7.1.0
+lxml==4.4.2
+nameparser==1.0.4
+pymongo==3.9.0
+regex==2019.11.1
+urllib3==1.25.7
