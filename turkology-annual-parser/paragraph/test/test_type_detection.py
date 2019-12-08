@@ -13,6 +13,7 @@ def test_detect_paragraph_types():
         ('Something', None),
         ('A. Allgemeines', 'keyword'),
         ('1. First citation', 'citation'),
+        ('• Some bullet point', 'amendment'),
         ('3. Second citation', 'citation'),
         ('Ac. bibliotheken', 'keyword'),
         ('4. Third citation', 'citation'),
