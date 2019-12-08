@@ -1,6 +1,8 @@
-from typing import Dict
+from typing import Dict, List
 
 import regex as re
+
+from paragraph.paragraph import Paragraph
 
 MAX_CITATION_GAP = 500
 
@@ -17,7 +19,7 @@ KNOWN_CITATION_GAPS_BY_VOLUME = {  # Ranges are inclusive
 }
 
 
-def detect_paragraph_types(paragraphs: Dict[str, str], keyword_mapping: Dict[str, Dict[str, str]]):
+def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[str, Dict[str, str]]):
     journal_section_begin_pattern = re.compile('ZEITSCHRIFTEN +UND')
     journal_pattern = re.compile('')
     keyword_pattern_base = '({})'.format(
@@ -40,7 +42,7 @@ def detect_paragraph_types(paragraphs: Dict[str, str], keyword_mapping: Dict[str
 
     for paragraph in paragraphs:
         paragraph_type = None
-        text = paragraph['text']
+        text = paragraph.text
         is_possible_amendment = previous_type == 'citation' or (previous_type and previous_type == 'amendment')
         citation_match = citation_pattern.fullmatch(text)
 
@@ -65,7 +67,7 @@ def detect_paragraph_types(paragraphs: Dict[str, str], keyword_mapping: Dict[str
                 paragraph_type = 'keyword'
             elif citation_section_has_begun and citation_match and (
                     0 < (int(citation_match.group(1)) - latest_citation_number) <= MAX_CITATION_GAP
-                    or _is_preceded_by_ocr_gap(paragraph['volume'], int(citation_match.group(1)))
+                    or _is_preceded_by_ocr_gap(paragraph.volume, int(citation_match.group(1)))
             ):
                 paragraph_type = 'citation'
                 latest_citation_number = int(citation_match.group(1))
@@ -87,7 +89,7 @@ def detect_paragraph_types(paragraphs: Dict[str, str], keyword_mapping: Dict[str
             elif citation_section_has_begun and citation_match:
                 paragraph_type = 'citation'
                 latest_citation_number = int(citation_match.group(1))
-        paragraph['type'] = paragraph_type
+        paragraph.type = paragraph_type
         yield paragraph
         if not page_number_pattern.fullmatch(text):
             previous_type = paragraph_type

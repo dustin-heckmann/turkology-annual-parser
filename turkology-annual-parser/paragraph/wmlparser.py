@@ -1,5 +1,7 @@
 from lxml import etree
 
+from paragraph.paragraph import Paragraph
+
 
 class WMLParser(object):
     def __init__(self, xml_filename):
@@ -14,12 +16,12 @@ class WMLParser(object):
         self._parse_xml()
         paragraph_nodes = self._xpath('//w:p')
         for paragraph_index, paragraph_node in enumerate(paragraph_nodes):
-            yield {
-                'originalIndex': paragraph_index,
-                **self._get_paragraph(paragraph_node)
-            }
+            yield Paragraph(
+                originalIndex=paragraph_index,
+                text=self._get_paragraph_text(paragraph_node)
+            )
 
-    def _get_paragraph(self, paragraph_node):
+    def _get_paragraph_text(self, paragraph_node) -> str:
         text_parts = []
         index_start = 0
         for text_node in self._xpath('w:r/w:t', element=paragraph_node):
@@ -29,9 +31,7 @@ class WMLParser(object):
             text_parts.append(text_part)
             index_end = index_start + len(text_part)
             index_start = index_end
-        return {
-            'text': ''.join(text_parts),
-        }
+        return ''.join(text_parts)
 
     def _xpath(self, expression, element=None):
         element = element if element is not None else self._document

@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
 import re
-from operator import itemgetter
+from dataclasses import replace
+from operator import attrgetter
+from typing import List
+
+from paragraph.paragraph import Paragraph
 
 
-def replace_text(search_pattern, replacement, paragraph):
-    paragraph = dict(**paragraph)
-    paragraph['text'] = re.sub(search_pattern, replacement, paragraph['text'])
-    return paragraph
+def replace_text(search_pattern, replacement, paragraph: Paragraph):
+    return replace(paragraph, text=re.sub(search_pattern, replacement, paragraph.text))
 
 
-def split_paragraph_before(paragraph, split_str):
-    text = paragraph['text']
-    del paragraph['text']
+def split_paragraph_before(paragraph: Paragraph, split_str):
+    text = paragraph.text
+    paragraph.text = None
     split_index = text.index(split_str)
     if split_index == -1:
         return [paragraph]
 
     def create_paragraph(text):
-        return dict(**paragraph, text=text)
+        return replace(paragraph, text=text)
 
     return [
         create_paragraph(text=text[:split_index]),
@@ -29,8 +31,8 @@ def flatten_list(list_of_lists):
     return [item for sublist in list_of_lists for item in sublist]
 
 
-def correct_paragraphs(paragraphs):
-    volume = paragraphs[0]['volume']
+def correct_paragraphs(paragraphs: List[Paragraph]):
+    volume = paragraphs[0].volume
     if volume == '2':
         paragraphs[3088] = merge_paragraphs(paragraphs[3088:3090])
         del paragraphs[3089]
@@ -255,7 +257,7 @@ def correct_paragraphs(paragraphs):
 
 
 def merge_paragraphs(paragraphs):
-    return {
-        'volume': paragraphs[0]['volume'],
-        'text': ' '.join(map(itemgetter('text'), paragraphs)),
-    }
+    return Paragraph(
+        volume=paragraphs[0].volume,
+        text=' '.join(map(attrgetter('text'), paragraphs)),
+    )

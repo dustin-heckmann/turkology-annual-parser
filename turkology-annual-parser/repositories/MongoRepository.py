@@ -1,4 +1,5 @@
 import logging
+from dataclasses import asdict
 
 import pymongo
 
@@ -39,7 +40,7 @@ class MongoRepository(Repository):
         self._citations.insert_one(citation)
 
     def insert_paragraphs(self, paragraphs):
-        self._paragraphs.insert_many(paragraphs)
+        self._paragraphs.insert_many(map(asdict, paragraphs))
 
     def distinct_author_names(self):
         return set([author.strip().lower() for author in self._citations.distinct('authors.raw') if author])
