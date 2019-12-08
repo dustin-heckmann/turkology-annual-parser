@@ -2,12 +2,15 @@
 
 import regex as re
 
-broken_bullet_pattern = re.compile('^[φ#0Φ]\s+', re.UNICODE)
+broken_bullet_pattern = re.compile(r'^[φ#0Φ]\s+', re.UNICODE)
 
 
 def postprocess_paragraph(paragraph):
     text = paragraph['text']
     if broken_bullet_pattern.match(text):
-        paragraph['original_text'] = text
-        paragraph['text'] = '•' + text[1:]
-    return paragraph
+        return {
+            **paragraph,
+            'original_text': text,
+            'text': '•' + text[1:],
+        }
+    return {**paragraph}
