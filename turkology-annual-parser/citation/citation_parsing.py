@@ -5,10 +5,7 @@ import re
 
 import regex
 
-try:
-    from .field_parsing import parse_citation_fields
-except (ImportError, SystemError):
-    from field_parsing import parse_citation_fields
+from .field_parsing import parse_citation_fields
 
 
 class CitationParser(object):
@@ -209,10 +206,10 @@ class CitationParser(object):
 
     def find_known_authors(self, citations, known_authors):
         known_authors = '|'.join([re.escape(author) for author in known_authors])
-        authors_pattern = regex.compile('^({}){{e<=1}}\.?\s+(\p{{Lu}}[^ .]+ )'.format(known_authors),
+        authors_pattern = regex.compile(r'^({}){{e<=1}}\.?\s+(\p{{Lu}}[^ .]+ )'.format(known_authors),
                                         regex.UNICODE | regex.IGNORECASE)
         multiple_authors_pattern = regex.compile(
-            '^({}){{e<=1}}(?: *[—-] *({}){{e<=1}})+\.?\s+(\p{{Lu}}[^ .]+ .+)'.format(known_authors, known_authors),
+            r'^({}){{e<=1}}(?: *[—-] *({}){{e<=1}})+\.?\s+(\p{{Lu}}[^ .]+ .+)'.format(known_authors, known_authors),
             regex.UNICODE | regex.IGNORECASE | regex.DOTALL)
 
         for citation in citations:
