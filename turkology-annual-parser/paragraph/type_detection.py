@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 import regex as re
 
 MAX_CITATION_GAP = 500
@@ -15,7 +17,7 @@ KNOWN_CITATION_GAPS_BY_VOLUME = {  # Ranges are inclusive
 }
 
 
-def detect_paragraph_types(paragraphs, keyword_mapping):
+def detect_paragraph_types(paragraphs: Dict[str, str], keyword_mapping: Dict[str, List[str]]):
     journal_section_begin_pattern = re.compile('ZEITSCHRIFTEN +UND')
     journal_pattern = re.compile('')
     keyword_pattern_base = '({})'.format(
