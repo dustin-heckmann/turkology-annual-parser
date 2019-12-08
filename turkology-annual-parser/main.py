@@ -102,7 +102,7 @@ def run_full_pipeline(
     pool.close()
 
 
-def run_full_pipeline_on_volume(volume_filename: str, keyword_mapping: Dict[str, List[str]]):
+def run_full_pipeline_on_volume(volume_filename: str, keyword_mapping: Dict[str, Dict[str, str]]):
     logging.info("START: %s", volume_filename)
 
     logging.debug('Extracting paragraphs...')
@@ -137,10 +137,10 @@ def run_full_pipeline_on_volume(volume_filename: str, keyword_mapping: Dict[str,
     logging.info('DONE: %s', volume_filename)
 
 
-def get_keyword_mapping(file_name: str) -> Dict[str, List[str]]:
+def get_keyword_mapping(file_name: str) -> Dict[str, Dict[str, str]]:
     with open(file_name, encoding='utf-8') as keyword_file:
         reader = csv.reader(keyword_file, delimiter=';', quotechar='"')
-        keyword_mapping = {code: [name_de, name_en] for (code, name_de, name_en) in reader}
+        keyword_mapping = {code: {'de': name_de, 'en': name_en} for (code, name_de, name_en) in reader}
         return keyword_mapping
 
 

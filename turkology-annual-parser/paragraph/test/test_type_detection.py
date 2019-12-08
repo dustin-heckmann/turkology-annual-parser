@@ -1,8 +1,8 @@
 from paragraph.type_detection import detect_paragraph_types
 
 KEYWORD_MAPPING = {
-    'A': ['Allgemeines', ''],
-    'AC': ['Bibliotheken', ''],
+    'A': {'de': 'Allgemeines'},
+    'AC': {'de': 'Bibliotheken'},
 }
 
 

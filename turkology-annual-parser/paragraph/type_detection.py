@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 
 import regex as re
 
@@ -17,13 +17,13 @@ KNOWN_CITATION_GAPS_BY_VOLUME = {  # Ranges are inclusive
 }
 
 
-def detect_paragraph_types(paragraphs: Dict[str, str], keyword_mapping: Dict[str, List[str]]):
+def detect_paragraph_types(paragraphs: Dict[str, str], keyword_mapping: Dict[str, Dict[str, str]]):
     journal_section_begin_pattern = re.compile('ZEITSCHRIFTEN +UND')
     journal_pattern = re.compile('')
     keyword_pattern_base = '({})'.format(
         '|'.join([
-            re.escape('{}. {}'.format(code, keyword))
-            for code, (keyword, _) in keyword_mapping.items()
+            re.escape('{}. {}'.format(code, translations['de']))
+            for code, translations in keyword_mapping.items()
         ])
     )
     keyword_pattern_exact = re.compile(keyword_pattern_base, re.IGNORECASE)

@@ -1,9 +1,10 @@
 import re
+from typing import Dict
 
 raw_keyword_pattern = re.compile(r'(?P<code>[A-Za-z]+)(?:\..+)?')
 
 
-def normalize_keywords_for_citation(citation, keyword_mapping):
+def normalize_keywords_for_citation(citation: Dict, keyword_mapping: Dict[str, Dict[str, str]]):
     normalized_keywords = []
     raw_keywords = citation.get('keywords', [])
     already_seen_codes = set(raw_keywords)
@@ -33,8 +34,8 @@ def normalize_keywords_for_citation(citation, keyword_mapping):
                 code = code.upper()
                 keyword = {
                     'code': code,
-                    'nameDE': keyword_mapping[code][0],
-                    'nameEN': keyword_mapping[code][1],
+                    'nameDE': keyword_mapping[code]['de'],
+                    'nameEN': keyword_mapping[code]['en'],
                     'raw': None if raw_keyword.endswith('___') else raw_keyword,
                 }
             else:
