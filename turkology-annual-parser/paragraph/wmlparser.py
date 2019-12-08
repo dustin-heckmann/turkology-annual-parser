@@ -7,20 +7,19 @@ class WMLParser(object):
             'w': 'http://schemas.microsoft.com/office/word/2003/wordml',
             'wx': 'http://schemas.microsoft.com/office/word/2003/auxHint',
         }
-        self._document = etree.parse(xml_filename).getroot()
-        self.paragraphs = self._extract_paragraphs()
+        self._xml_filename = xml_filename
+        self._document = None
 
-    def _extract_paragraphs(self):
+    def __iter__(self):
+        self._parse_xml()
         paragraph_nodes = self._xpath('//w:p')
         for paragraph_index, paragraph_node in enumerate(paragraph_nodes):
-            paragraph = {
+            yield {
                 'originalIndex': paragraph_index,
+                **self._get_paragraph(paragraph_node)
             }
-            paragraph.update(self._get_paragraph_text(paragraph_node))
 
-            yield paragraph
-
-    def _get_paragraph_text(self, paragraph_node):
+    def _get_paragraph(self, paragraph_node):
         text_parts = []
         index_start = 0
         for text_node in self._xpath('w:r/w:t', element=paragraph_node):
@@ -39,3 +38,6 @@ class WMLParser(object):
         if element is self._document:
             expression = '/w:wordDocument' + ('' if expression[0] == '/' else '/') + expression
         return element.xpath(expression, namespaces=self.namespaces)
+
+    def _parse_xml(self):
+        self._document = etree.parse(self._xml_filename).getroot()

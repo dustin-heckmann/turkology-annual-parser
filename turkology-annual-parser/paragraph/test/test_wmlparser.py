@@ -9,12 +9,12 @@ TA26 = 'TA26_02_Xhosa_formatted_pb_nopics.xml'
 
 def test_parser_gets_correct_number_of_paragraphs_vol_1():
     parser = WMLParser(get_xml_path(TA01))
-    assert len(list(parser.paragraphs)) == 3332
+    assert len(list(parser)) == 3332
 
 
 def test_parser_returns_specific_paragraphs_vol_1():
     parser = WMLParser(get_xml_path(TA01))
-    paragraphs = list(islice(parser.paragraphs, 1200, 1202))
+    paragraphs = list(islice(parser, 1200, 1202))
     assert paragraphs == [
         {
             'originalIndex': 1200,
@@ -29,12 +29,12 @@ def test_parser_returns_specific_paragraphs_vol_1():
 
 def test_parser_gets_correct_number_of_paragraphs_vol_26():
     parser = WMLParser(get_xml_path(TA26))
-    assert len(list(parser.paragraphs)) == 7138
+    assert len(list(parser)) == 7138
 
 
 def test_parser_returns_specific_paragraphs_vol_26():
     parser = WMLParser(get_xml_path(TA26))
-    paragraphs = list(islice(parser.paragraphs, 5560, 5562))
+    paragraphs = list(islice(parser, 5560, 5562))
     assert paragraphs == [
         {
             'originalIndex': 5560,
