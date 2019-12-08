@@ -35,9 +35,10 @@ def main():
     if args.full:
         run_full_pipeline(args.ocr_files, args.keyword_file, repository)
 
-    args.find_authors and find_authors(repository)
-    args.resolve_repetitions and resolve_repetitions(repository)
-    # write_to_elastic(repository)
+    if args.find_authors:
+        find_authors(repository)
+    if args.resolve_repetitions:
+        resolve_repetitions(repository)
 
 
 def find_authors(repository: Repository):

@@ -1,5 +1,3 @@
-from collections import OrderedDict
-
 from lxml import etree
 
 
@@ -9,7 +7,7 @@ class WMLParser(object):
             'w': 'http://schemas.microsoft.com/office/word/2003/wordml',
             'wx': 'http://schemas.microsoft.com/office/word/2003/auxHint',
         }
-        self.document = etree.parse(xml_filename).getroot()
+        self._document = etree.parse(xml_filename).getroot()
         self.paragraphs = self._extract_paragraphs()
 
     def _extract_paragraphs(self):
@@ -37,7 +35,7 @@ class WMLParser(object):
         }
 
     def _xpath(self, expression, element=None):
-        element = element if element is not None else self.document
-        if element is self.document:
+        element = element or self._document
+        if element is self._document:
             expression = '/w:wordDocument' + ('' if expression[0] == '/' else '/') + expression
         return element.xpath(expression, namespaces=self.namespaces)
