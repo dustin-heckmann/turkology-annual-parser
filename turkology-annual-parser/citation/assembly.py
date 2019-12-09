@@ -19,13 +19,13 @@ def assemble_citations(paragraphs: List[Paragraph]):
                 yield current_citation
             current_citation = OrderedDict(
                 volume=paragraph.volume,
-                keywords=[current_keyword],
+                keywords=[current_keyword] if current_keyword else [],
                 rawText=paragraph.text,
                 _version=1,
                 _last_modified=datetime.now(),
                 _creator='<initial>',
             )
-        elif paragraph.type and paragraph.type == 'amendment':
+        elif paragraph.type == 'amendment':
             current_citation.setdefault('amendments', []).append(paragraph.text)
     if current_citation:
         yield current_citation
