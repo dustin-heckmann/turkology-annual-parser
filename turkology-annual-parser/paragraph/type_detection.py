@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import regex as re
 
-from paragraph.paragraph import Paragraph
+from paragraph.paragraph import Paragraph, ParagraphType
 
 MAX_CITATION_GAP = 500
 
@@ -43,51 +43,52 @@ def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[st
     for paragraph in paragraphs:
         paragraph_type = None
         text = paragraph.text
-        is_possible_amendment = previous_type == 'citation' or (previous_type and previous_type == 'amendment')
+        is_possible_amendment = previous_type == ParagraphType.CITATION or (
+                    previous_type and previous_type == ParagraphType.AMENDMENT)
         citation_match = citation_pattern.fullmatch(text)
 
         if not journal_section_has_begun:
             if journal_section_begin_pattern.search(text):
-                paragraph_type = 'journal-section-begin'
+                paragraph_type = ParagraphType.JOURNAL_SECTION_BEGIN
                 journal_section_has_begun = True
 
         if journal_section_has_begun and not citation_section_has_begun:
             journal_match = journal_pattern.search(text)
             if False and journal_match:
-                paragraph_type = 'journal'
+                paragraph_type = ParagraphType.JOURNAL
             elif keyword_pattern_fuzzy.fullmatch(text):
-                paragraph_type = 'keyword'
+                paragraph_type = ParagraphType.KEYWORD
             elif citation_section_has_begun and text.split('.')[0] in keyword_mapping:
-                paragraph_type = 'keyword'
-            if paragraph_type == 'keyword':
+                paragraph_type = ParagraphType.KEYWORD
+            if paragraph_type == ParagraphType.KEYWORD:
                 citation_section_has_begun = True
 
         if citation_section_has_begun and not index_has_begun:
             if keyword_pattern_exact.fullmatch(text):
-                paragraph_type = 'keyword'
+                paragraph_type = ParagraphType.KEYWORD
             elif citation_section_has_begun and citation_match and (
                     0 < (int(citation_match.group(1)) - latest_citation_number) <= MAX_CITATION_GAP
                     or _is_preceded_by_ocr_gap(paragraph.volume, int(citation_match.group(1)))
             ):
-                paragraph_type = 'citation'
+                paragraph_type = ParagraphType.CITATION
                 latest_citation_number = int(citation_match.group(1))
             elif keyword_pattern_fuzzy.fullmatch(text):
-                paragraph_type = 'keyword'
+                paragraph_type = ParagraphType.KEYWORD
             elif citation_section_has_begun and text.split('.')[0] in keyword_mapping:
-                paragraph_type = 'keyword'
+                paragraph_type = ParagraphType.KEYWORD
             elif text.startswith('•') and is_possible_amendment:
-                paragraph_type = 'amendment'
+                paragraph_type = ParagraphType.AMENDMENT
             elif text.startswith('Rez.') and is_possible_amendment:
-                paragraph_type = 'amendment'
+                paragraph_type = ParagraphType.AMENDMENT
             elif text.startswith('Bericht') and is_possible_amendment:
-                paragraph_type = 'amendment'
+                paragraph_type = ParagraphType.AMENDMENT
             elif text == 'Autoren, Herausgeber, Übersetzer, Rezensenten' or text == 'INDEX':
-                paragraph_type = 'author-index-begin'
+                paragraph_type = ParagraphType.AUTHOR_INDEX_BEGIN
                 index_has_begun = True
             elif broken_bullet_pattern.match(text) and is_possible_amendment:
-                paragraph_type = 'amendment'
+                paragraph_type = ParagraphType.AMENDMENT
             elif citation_section_has_begun and citation_match:
-                paragraph_type = 'citation'
+                paragraph_type = ParagraphType.CITATION
                 latest_citation_number = int(citation_match.group(1))
         paragraph.type = paragraph_type
         yield paragraph

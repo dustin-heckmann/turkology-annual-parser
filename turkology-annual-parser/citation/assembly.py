@@ -1,10 +1,9 @@
 # -*- coding: utf-8 -*-
 
-from collections import OrderedDict
-from datetime import datetime
 from typing import List
 
-from paragraph.paragraph import Paragraph
+from citation.intermediate_citation import IntermediateCitation
+from paragraph.paragraph import Paragraph, ParagraphType
 
 
 def assemble_citations(paragraphs: List[Paragraph]):
@@ -12,20 +11,17 @@ def assemble_citations(paragraphs: List[Paragraph]):
     current_citation = None
 
     for paragraph in paragraphs:
-        if paragraph.type == 'keyword':
+        if paragraph.type == ParagraphType.KEYWORD:
             current_keyword = paragraph.text
-        elif paragraph.type == 'citation':
+        elif paragraph.type == ParagraphType.CITATION:
             if current_citation:
                 yield current_citation
-            current_citation = OrderedDict(
+            current_citation = IntermediateCitation(
                 volume=paragraph.volume,
+                raw_text=paragraph.text,
                 keywords=[current_keyword] if current_keyword else [],
-                rawText=paragraph.text,
-                _version=1,
-                _last_modified=datetime.now(),
-                _creator='<initial>',
             )
-        elif paragraph.type == 'amendment':
-            current_citation.setdefault('amendments', []).append(paragraph.text)
+        elif paragraph.type == ParagraphType.AMENDMENT:
+            current_citation.amendments.append(paragraph.text)
     if current_citation:
         yield current_citation

@@ -1,67 +1,94 @@
-import logging
 import re
 from datetime import datetime
 
 import nameparser
 
-
-def parse_citation_fields(citation):
-    citation = {
-        field: parse_field(field, value) for field, value in citation.items()
-    }
-    citation = parse_amendments_or_comments(citation, 'comments')
-    citation = parse_amendments_or_comments(citation, 'amendments')
-    return citation
+from citation.citation import Citation, Person
+from citation.intermediate_citation import IntermediateCitation
 
 
-def parse_field(field_name, value):
-    parse_function = {
-        'authors': parse_name,
-        'editors': parse_name,
-        'translators': parse_name,
-        'in': parse_reference,
-        'material': parse_material,
-        'date': parse_date,
-        'taReferences': parse_ta_references,
-        # 'amendments': parse_amendments,
-        # 'reviews': parse_reviews,
-    }.get(field_name, lambda x: x)
+def parse_citation_fields(intermediate: IntermediateCitation) -> Citation:
+    reviews, comments = parse_amendments_or_comments([intermediate.comment])
+    more_reviews, amendments = parse_amendments_or_comments(intermediate.amendments)
+    reviews.extend(more_reviews)
+    reviews.extend(parse_reviews(intermediate.reviews))
+    return Citation(
+        _meta={'fully_parsed': intermediate.fully_parsed},
+        volume=intermediate.volume,
+        number=int(intermediate.number),
+        type=intermediate.type,
+        title=intermediate.title,
+        location=intermediate.location,
+        series=intermediate.series,
+        keywords=intermediate.keywords,
+        number_of_volumes=intermediate.number_of_volumes,
+        number_of_pages=intermediate.number_of_pages,
+        authors=parse_authors(intermediate.authors),
+        editors=parse_editors_or_translators(intermediate.editors),
+        translators=parse_editors_or_translators(intermediate.translators),
+        comments=comments,
+        reviews=reviews,
+        published_in=parse_reference(intermediate.published_in),
+        amendments=amendments,
+        date_published=parse_date_published(intermediate.date_published),
+        raw_text=intermediate.raw_text,
+        material=parse_material(intermediate.material),
+        date=parse_date(intermediate.date),
+        ta_references=parse_ta_references(intermediate.ta_references),
+        remaining_text=intermediate.remaining_text
+    )
 
-    try:
-        if isinstance(value, list):
-            return [parse_function(sub_value) or sub_value for sub_value in value]
-        else:
-            return parse_function(value) or value
-    except:
-        logging.exception('Error parsing field \'{}\' with value \'{}\''.format(field_name, value))
 
-
-def parse_amendments_or_comments(citation, field_name):
-    if not citation.get(field_name):
-        return citation
+def parse_amendments_or_comments(texts):
+    if not texts:
+        return [], []
     unparseable_amendments = []
-    for amendment_string in citation.get(field_name, []):
-        if amendment_string.startswith('Rez.'):
+    reviews = []
+    for amendment_string in texts:
+        if not amendment_string:
+            continue
+        bullet_pattern = re.compile(r'^[•φ#0Φ]\s+')  # , s\.( a\.)? \d+')
+        amendment_string = re.sub(bullet_pattern, '', amendment_string)
+        if amendment_string and amendment_string.startswith('Rez.'):
             amendment_string = re.sub('^Rez\. *', '', amendment_string)
-            citation.setdefault('reviews', []).extend(re.split(r'\s+—\s+', amendment_string))
+            reviews.extend(re.split(r'\s+—\s+', amendment_string))
         else:
             unparseable_amendments.append(amendment_string)
-    if not unparseable_amendments:
-        del citation[field_name]
-    return citation
+    return reviews, unparseable_amendments
+
+
+def parse_reviews(review_str):
+    if review_str:
+        return re.split(r'\s+—\s+', review_str)
+    return []
+
+
+def parse_authors(authors):
+    if authors:
+        return list(map(parse_name, re.split('[—-]', authors)))
+    return []
+
+
+def parse_editors_or_translators(people):
+    if people:
+        return list(map(parse_name, re.split(r'\s*(?:,| und )\s*', people)))
+    return []
 
 
 def parse_name(name):
     if not isinstance(name, str):
         return name
-    name_dict = nameparser.HumanName(name).as_dict(include_empty=False)
-    name_dict['raw'] = name
-    return name_dict
+    parsed_name = nameparser.HumanName(name)
+    return Person(
+        first=parsed_name.first if parsed_name.first else None,
+        middle=parsed_name.middle if parsed_name.middle else None,
+        last=parsed_name.last if parsed_name.last else None,
+        raw=name
+    )
 
 
 def parse_ta_references(reference_string):
-    if type(reference_string) == dict:
-        return reference_string
+    if not reference_string: return []
     reference_string = re.sub('^s\. TA ', '', reference_string)
     reference_strings = re.split(', ', reference_string)
     references = []
@@ -107,7 +134,7 @@ reference_patterns.extend(
 
 def parse_reference(raw_reference):
     if not isinstance(raw_reference, str):
-        return raw_reference
+        return None
     raw_reference = raw_reference.strip('. ')
     for reference_type, reference_pattern in reference_patterns:
         reference_match = reference_pattern.search(raw_reference)
@@ -123,7 +150,7 @@ def parse_reference(raw_reference):
                     group_dict[key] = int(value)
             group_dict['type'] = reference_type
             group_dict['raw'] = raw_reference
-            return group_dict
+            return group_dict or None
 
 
 def parse_material(material):
@@ -152,6 +179,14 @@ def parse_material(material):
     }
 
 
+def parse_date_published(date_str: str):
+    if date_str and date_str.isdigit():
+        return {
+            'year': int(date_str)
+        }
+    return None
+
+
 def parse_date(date_str):
     if not isinstance(date_str, str):
         return date_str
@@ -171,8 +206,15 @@ def parse_date(date_str):
         month_start = roman_numerals.index(match.group(2).lower()) + 1 if match.group(2) else month_end
         year_start = int(match.group(3)) if match.group(3) else year_end
 
-        date_start = datetime(year_start, month_start, day_start)
-        date_end = datetime(year_end, month_end, day_end)
+        try:
+            date_start = datetime(year_start, month_start, day_start).isoformat()
+        except ValueError:
+            print([year_start, month_start, day_start])
+            date_start = None
+        try:
+            date_end = datetime(year_end, month_end, day_end)
+        except ValueError:
+            date_end = None
 
         return {
             'start': date_start,

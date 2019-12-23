@@ -1,5 +1,5 @@
 import logging
-from dataclasses import asdict
+from dataclasses import asdict, replace
 
 import pymongo
 
@@ -10,9 +10,7 @@ class MongoRepository(Repository):
     def __init__(self, host=None, port=None, db=None):
         database = pymongo.MongoClient(host, port)[db]
         logging.info({'host': host, 'port': port, 'db': db})
-        self._paragraphs = database['paragraphs']
         self._citations = database['citations']
-        self._create_indexes()
 
     def _create_indexes(self):
         logging.info('Creating indexes...')
@@ -29,28 +27,29 @@ class MongoRepository(Repository):
         )
 
     def insert_citations(self, citations):
-        self._citations.insert_many(citations)
-
-    def insert_citation(self, citation):
-        if '_id' in citation:
-            self._citations.update({'_id': citation['_id']}, {'$set': {'_obsolete': True}})
-            del citation['_id']
-        self._citations.update({'volume': citation['volume'], 'number': citation['number']},
-                               {'$set': {'_obsolete': True}})
-        self._citations.insert_one(citation)
-
-    def insert_paragraphs(self, paragraphs):
-        self._paragraphs.insert_many(map(asdict, paragraphs))
-
-    def distinct_author_names(self):
-        return set([author.strip().lower() for author in self._citations.distinct('authors.raw') if author])
-
-    def citations_with_missing_author(self):
-        return self._citations.find({'authors': None, 'fullyParsed': False, '_obsolete': {'$ne': True}})
-
-    def all_citations(self):
-        return self._citations.find({'_obsolete': {'$ne': True}})
+        self._citations.insert_many(
+            (asdict(
+                replace(citation, type=citation.type.value if citation.type else None), dict_factory=to_dict) for
+            citation in citations
+            )
+        )
+        self._create_indexes()
 
     def delete_all_data(self):
-        self._paragraphs.drop()
         self._citations.drop()
+
+
+def to_dict(it):
+    return dict(
+        [
+            (to_camel_case(key), value)
+            for key, value in dict(it).items()
+        ]
+    )
+
+
+def to_camel_case(snake_str):
+    components = snake_str.split('_')
+    # We capitalize the first letter of each component except the first one
+    # with the 'title' method and join them together.
+    return components[0] + ''.join(x.title() for x in components[1:])

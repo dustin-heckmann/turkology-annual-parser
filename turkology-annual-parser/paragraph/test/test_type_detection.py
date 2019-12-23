@@ -1,4 +1,4 @@
-from paragraph.paragraph import Paragraph
+from paragraph.paragraph import Paragraph, ParagraphType
 from paragraph.type_detection import detect_paragraph_types
 
 KEYWORD_MAPPING = {
@@ -10,15 +10,15 @@ KEYWORD_MAPPING = {
 def test_detect_paragraph_types():
     sample_paragraphs_with_expected_types = [
         ('Something', None),
-        ('ZEITSCHRIFTEN  UND', 'journal-section-begin'),
+        ('ZEITSCHRIFTEN  UND', ParagraphType.JOURNAL_SECTION_BEGIN),
         ('Something', None),
-        ('A. Allgemeines', 'keyword'),
-        ('1. First citation', 'citation'),
-        ('• Some bullet point', 'amendment'),
-        ('3. Second citation', 'citation'),
-        ('Ac. bibliotheken', 'keyword'),
-        ('4. Third citation', 'citation'),
-        ('Autoren, Herausgeber, Übersetzer, Rezensenten', 'author-index-begin'),
+        ('A. Allgemeines', ParagraphType.KEYWORD),
+        ('1. First citation', ParagraphType.CITATION),
+        ('• Some bullet point', ParagraphType.AMENDMENT),
+        ('3. Second citation', ParagraphType.CITATION),
+        ('Ac. bibliotheken', ParagraphType.KEYWORD),
+        ('4. Third citation', ParagraphType.CITATION),
+        ('Autoren, Herausgeber, Übersetzer, Rezensenten', ParagraphType.AUTHOR_INDEX_BEGIN),
         ('Something', None),
     ]
     paragraphs = [Paragraph(text=p, volume='130') for p, _ in sample_paragraphs_with_expected_types]
