@@ -6,6 +6,5 @@ KEYWORDS_FILE=data/keywords.csv
 
 echo "Running..."
 python $SOURCE_DIR/main.py --ocr-file $OCR_FILES --keyword-file $KEYWORDS_FILE \
-  --full \
   --find-authors \
    --resolve-repetitions \
