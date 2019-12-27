@@ -58,7 +58,10 @@ def resolve_repetitions(citations: List[Citation]):
 
 
 def save_citations(citations: List[Citation]):
-    index_repository = ElasticSearchRepository()
+    index_repository = ElasticSearchRepository(
+        host=os.getenv('ELASTIC_HOST', 'localhost'),
+        index=os.getenv('ELASTIC_INDEX', 'citations')
+    )
     index_repository.insert_citations(citations)
 
 
