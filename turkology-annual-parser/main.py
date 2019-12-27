@@ -16,8 +16,6 @@ from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
 from repetitions import add_repeated_info
 from repositories.ElasticSearchRepository import ElasticSearchRepository
-from repositories.MongoRepository import MongoRepository
-from repositories.Repository import Repository
 
 
 def main():
@@ -37,9 +35,7 @@ def main():
         citations = find_authors(citations)
     if args.resolve_repetitions:
         citations = resolve_repetitions(citations)
-    repository = create_repository()
-    repository.delete_all_data()
-    repository.insert_citations(citations)
+    save_citations(citations)
 
 
 def find_authors(citations: List[Citation]):
@@ -61,18 +57,9 @@ def resolve_repetitions(citations: List[Citation]):
     return add_repeated_info(citations)
 
 
-def write_to_index(repository: Repository):
-    return
+def save_citations(citations: List[Citation]):
     index_repository = ElasticSearchRepository()
-    index_repository.insert_citations(repository.all_citations())
-
-
-def create_repository() -> Repository:
-    return MongoRepository(
-        host=os.getenv('MONGODB_HOST', 'localhost'),
-        port=os.getenv('MONOGODB_PORT', 27017),
-        db=os.getenv('MONGODB_DATABASE', 'turkology')
-    )
+    index_repository.insert_citations(citations)
 
 
 def run_full_pipeline(
