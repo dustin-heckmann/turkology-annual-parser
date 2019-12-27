@@ -8,7 +8,7 @@ from typing import List
 import regex
 
 from citation.citation import Citation, CitationType
-from citation.field_parsing import parse_authors, parse_name
+from citation.field_parsing import parse_name
 from citation.intermediate_citation import IntermediateCitation
 
 
@@ -248,6 +248,4 @@ class CitationParser(object):
                         or self.find_authors(citation, known_authors_pattern)
                         or citation
                 )
-                if citation.authors:
-                    pass#print(citation.volume, citation.number)
             yield citation

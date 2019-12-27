@@ -30,7 +30,7 @@ class MongoRepository(Repository):
         self._citations.insert_many(
             (asdict(
                 replace(citation, type=citation.type.value if citation.type else None), dict_factory=to_dict) for
-            citation in citations
+                citation in citations
             )
         )
         self._create_indexes()

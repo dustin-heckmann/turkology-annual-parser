@@ -1,5 +1,4 @@
 from collections import defaultdict
-from pprint import pprint
 from typing import List
 
 from citation.citation import Citation, CitationType

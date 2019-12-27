@@ -44,7 +44,7 @@ def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[st
         paragraph_type = None
         text = paragraph.text
         is_possible_amendment = previous_type == ParagraphType.CITATION or (
-                    previous_type and previous_type == ParagraphType.AMENDMENT)
+                previous_type and previous_type == ParagraphType.AMENDMENT)
         citation_match = citation_pattern.fullmatch(text)
 
         if not journal_section_has_begun:
