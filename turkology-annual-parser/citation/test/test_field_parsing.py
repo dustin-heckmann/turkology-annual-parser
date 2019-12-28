@@ -43,9 +43,6 @@ def test_parse_citation_fields():
         location='Stuttgart',
         series='Urban-Taschenbücher, 200/1-3',
         number_of_volumes='3',
-        _meta={
-            'fully_parsed': True
-        },
         authors=[
             Person(first='L.', last='Bazin', raw='Bazin, L.')
         ],

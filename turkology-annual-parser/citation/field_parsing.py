@@ -13,7 +13,6 @@ def parse_citation_fields(intermediate: IntermediateCitation) -> Citation:
     reviews.extend(more_reviews)
     reviews.extend(parse_reviews(intermediate.reviews))
     return Citation(
-        _meta={'fully_parsed': intermediate.fully_parsed},
         volume=intermediate.volume,
         number=int(intermediate.number),
         type=intermediate.type,
