@@ -11,8 +11,7 @@ def add_repeated_info(citations: List[Citation]):
         if citation.ta_references:
             citation.type = CitationType.REPETITION
             reference = citation.ta_references[0]
-            repetition_links[(str(reference['volume']), reference['number'])].append(citation)
-    # pprint(repetition_links)
+            repetition_links[(reference['volume'], reference['number'])].append(citation)
     for citation in citations:
         citation_key = (citation.volume, citation.number)
         for repetition in repetition_links.get(citation_key, []):
