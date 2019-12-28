@@ -227,7 +227,7 @@
           "type": "keyword"
         },
         "volume": {
-          "type": "keyword"
+          "type": "long"
         }
       }
     }

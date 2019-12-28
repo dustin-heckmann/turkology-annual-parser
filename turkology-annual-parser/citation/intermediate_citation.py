@@ -1,12 +1,13 @@
 from dataclasses import dataclass, field
-from typing import Optional, List
+from typing import List
+
+from citation.citation import CitationType
 
 
 @dataclass
 class IntermediateCitation:
-    volume: str = None
+    volume: int = None
     number: str = None
-    type: str = None
     title: str = None
     authors: str = None
     editors: str = None
@@ -23,7 +24,7 @@ class IntermediateCitation:
     material: List[str] = field(default_factory=list)
     amendments: List[str] = field(default_factory=list)
     date_published: str = None
-    type: Optional[str] = None
+    type: CitationType = None
     ta_references: List[str] = field(default_factory=list)
     page_range: str = None
     series: str = None
