@@ -6,5 +6,5 @@ COPY data /data/
 COPY install.sh /
 COPY run.sh /
 
-RUN ./install.sh
+RUN pip install -r requirements.txt
 ENTRYPOINT ["./run.sh"]
