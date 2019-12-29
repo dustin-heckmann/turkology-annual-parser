@@ -288,13 +288,22 @@ def find_known_authors(citations: List[Citation], known_authors):
                     or find_authors(citation, known_authors_pattern)
                     or citation
             )
-        yield citation
+        yield reparse_citation(citation)
+
+
+def reparse_citation(citation: Citation):
+    if not citation.title:
+        text = parse_title(citation, citation.remaining_text)
+        citation.remaining_text = text
+    return citation
 
 
 def find_authors(citation, known_authors_pattern):
     citation = replace(citation)
-    authors_pattern = regex.compile(r'^({}){{e<=1}}\.?\s+(\p{{Lu}}[^ .]+ )'.format(known_authors_pattern),
-                                    regex.UNICODE | regex.IGNORECASE)
+    authors_pattern = regex.compile(
+        r'^({}){{e<=1}}\.?\s+(\p{{Lu}}[^ .]+ )'.format(known_authors_pattern),
+        regex.UNICODE | regex.IGNORECASE
+    )
     author_match = authors_pattern.search(citation.remaining_text)
 
     if author_match:
