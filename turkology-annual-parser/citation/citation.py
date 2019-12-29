@@ -38,7 +38,7 @@ class Citation:
     location: str = None
     material: List[dict] = field(default_factory=list)
     amendments: List[str] = field(default_factory=list)
-    date_published: dict = field(default_factory=dict)
+    date_published: dict = None
     originalIndex: int = None
     ta_references: List[dict] = field(default_factory=list)
     page_start: int = None
