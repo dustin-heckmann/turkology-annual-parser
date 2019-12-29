@@ -1,5 +1,5 @@
 from citation.citation import CitationType
-from citation.citation_parsing import CitationParser
+from citation.citation_parsing import parse_citation
 from citation.intermediate_citation import IntermediateCitation
 
 
@@ -8,7 +8,7 @@ def test_parse_citation():
         volume=1,
         raw_text='1. Lexikon der islamischen Welt. Klaus Kreiser, Werner Diem, Hans Georg Majer ed. 3 Bde., Stuttgart, 1974 (Urban-Taschenbücher, 200/1-3).'
     )
-    parsed_citation = CitationParser().parse_citation(raw_citation)
+    parsed_citation = parse_citation(raw_citation)
 
     assert parsed_citation == IntermediateCitation(
         fully_parsed=True,
@@ -31,17 +31,15 @@ def test_parse_citation():
 
 
 def test_parse_collection():
-    raw_citation = IntermediateCitation(
-        volume=1,
-        raw_text='98. Russian colonial expansion to 1917. Eingeleitet von Sy ed Z. abedin. Michael Rywkin ed. London, 1988, XVΠ+274 S.'
-    )
-    parsed_citation = CitationParser().parse_citation(raw_citation)
+    raw_text = '98. Russian colonial expansion to 1917. Eingeleitet von Sy ed Z. abedin. Michael Rywkin ed. London, 1988, XVΠ+274 S.'
+    raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
+    parsed_citation = parse_citation(raw_citation)
     assert parsed_citation == IntermediateCitation(
         volume=1, number='98', type=CitationType.COLLECTION,
         editors='Michael Rywkin',
         remaining_text='Russian colonial expansion to 1917. Eingeleitet von Sy ed Z. abedin.  {{{ editors }}}  London, 1988, XVΠ+274 S.',
         fully_parsed=False,
-        raw_text='98. Russian colonial expansion to 1917. Eingeleitet von Sy ed Z. abedin. Michael Rywkin ed. London, 1988, XVΠ+274 S.'
+        raw_text=raw_text
     )
 
 
@@ -69,9 +67,8 @@ def test_does_not_crash():
         '191. Ljubljana (Laibach), 4.-5. XII. 1975: Jugoslovenska orijentalistika i nesvrstani svijet [Die jugoslavische Orientalistik und die blockfreie Welt].',
         '3. Biographisches Lexikon zur Geschichte Südosteuropas [s. TA 1.3, 2.3, 3.3].',
     ]
-    parser = CitationParser()
     for raw_citation in citations:
-        parsed_citation = parser.parse_citation(IntermediateCitation(volume=1, raw_text=raw_citation))
+        parsed_citation = parse_citation(IntermediateCitation(volume=1, raw_text=raw_citation))
         assert parsed_citation.number.isdigit()
         assert parsed_citation.raw_text == raw_citation
         assert isinstance(parsed_citation, IntermediateCitation)

@@ -8,7 +8,7 @@ from typing import Dict, List
 
 from citation.assembly import assemble_citations
 from citation.citation import Citation
-from citation.citation_parsing import CitationParser
+from citation.citation_parsing import find_known_authors, parse_citation
 from citation.field_parsing import parse_citation_fields
 from citation.keywords import normalize_keywords_for_citation
 from paragraph.paragraph_correction import correct_paragraphs
@@ -41,7 +41,7 @@ def main():
 def find_authors(citations: List[Citation]):
     known_authors = get_known_authors_from_citations(citations)
     logging.info('Found {} distinct authors'.format(len(known_authors)))
-    return CitationParser().find_known_authors(citations, known_authors)
+    return find_known_authors(citations, known_authors)
 
 
 def get_known_authors_from_citations(citations: List[Citation]):
@@ -103,8 +103,7 @@ def run_full_pipeline_on_volume(
     raw_citations = assemble_citations(typed_paragraphs)
 
     logging.debug('Parsing citations...')
-    parser = CitationParser()
-    citations = [parser.parse_citation(citation) for citation in raw_citations]
+    citations = [parse_citation(citation) for citation in raw_citations]
     citations = [parse_citation_fields(citation) for citation in citations]
     assert citations[0].authors is not None
     citations = [normalize_keywords_for_citation(citation, keyword_mapping) for citation in citations]
