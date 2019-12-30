@@ -1,5 +1,6 @@
 import re
 from dataclasses import replace
+from operator import itemgetter
 from typing import Dict
 
 from citation.citation import Citation
@@ -9,13 +10,13 @@ raw_keyword_pattern = re.compile(r'(?P<code>[A-Za-z]+)(?:\..+)?')
 
 def normalize_keywords_for_citation(citation: Citation, keyword_mapping: Dict[str, Dict[str, str]]):
     keywords = []
-    for raw_keyword in citation.keywords:
-        raw_keyword = fix_ocr_errors(raw_keyword)
-        code = extract_keyword_code(raw_keyword)
+    for unparsed_keyword in map(itemgetter('raw'), citation.keywords):
+        unparsed_keyword = fix_ocr_errors(unparsed_keyword)
+        code = extract_keyword_code(unparsed_keyword)
         if not code:
-            keywords.append({'raw': raw_keyword})
+            keywords.append({'raw': unparsed_keyword})
             continue
-        keyword = make_keyword(code, keyword_mapping, raw_keyword)
+        keyword = make_keyword(code, keyword_mapping, unparsed_keyword)
         keywords.append(keyword)
     if keywords:
         citation = replace(citation, keywords=keywords)

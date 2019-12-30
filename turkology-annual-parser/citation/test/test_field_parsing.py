@@ -1,4 +1,4 @@
-from citation.citation import Citation, Person
+from citation.citation import Citation, Person, CitationType
 from citation.field_parsing import parse_citation_fields
 from citation.intermediate_citation import IntermediateCitation
 
@@ -18,8 +18,8 @@ CITATION = IntermediateCitation(
     number_of_volumes='3',
     title='Lexikon der islamischen Welt',
     date_published='1974',
-    type='collection',
-    volume='1',
+    type=CitationType.COLLECTION,
+    volume=1,
 )
 
 
@@ -27,16 +27,16 @@ def test_parse_citation_fields():
     field_parsed_citation = parse_citation_fields(CITATION)
 
     assert field_parsed_citation == Citation(
-        volume='1',
+        volume=1,
         number=1,
-        type='collection',
+        type=CitationType.COLLECTION,
         title='Lexikon der islamischen Welt',
         editors=[
             Person(first='Klaus', last='Kreiser', raw='Klaus Kreiser'),
             Person(first='Werner', last='Diem', raw='Werner Diem'),
             Person(first='Hans', middle='Georg', last='Majer', raw='Hans Georg Majer')
         ],
-        keywords=['A', 'B'],
+        keywords=[{'raw': 'A'}, {'raw': 'B'}],
         reviews=[],
         comments=[],
         date_published={'year': 1974},

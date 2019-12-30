@@ -19,7 +19,7 @@ def parse_citation_fields(intermediate: IntermediateCitation) -> Citation:
         title=intermediate.title,
         location=intermediate.location,
         series=intermediate.series,
-        keywords=intermediate.keywords,
+        keywords=[{'raw': keyword} for keyword in intermediate.keywords],
         number_of_volumes=intermediate.number_of_volumes,
         number_of_pages=intermediate.number_of_pages,
         authors=parse_authors(intermediate.authors),
