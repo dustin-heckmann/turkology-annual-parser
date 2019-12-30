@@ -10,6 +10,7 @@ from citation.assembly import assemble_citations
 from citation.citation import Citation
 from citation.citation_parsing import find_known_authors, parse_citation
 from citation.field_parsing import parse_citation_fields
+from citation.ids import assign_citation_ids
 from citation.keywords import normalize_keywords_for_citation
 from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
@@ -103,10 +104,10 @@ def run_full_pipeline_on_volume(
     raw_citations = assemble_citations(typed_paragraphs)
 
     logging.debug('Parsing citations...')
-    citations = [parse_citation(citation) for citation in raw_citations]
-    citations = [parse_citation_fields(citation) for citation in citations]
-    assert citations[0].authors is not None
-    citations = [normalize_keywords_for_citation(citation, keyword_mapping) for citation in citations]
+    citations = (parse_citation(citation) for citation in raw_citations)
+    citations = (parse_citation_fields(citation) for citation in citations)
+    citations = assign_citation_ids(citations)
+    citations = (normalize_keywords_for_citation(citation, keyword_mapping) for citation in citations)
     for citation in citations:
         queue.put(citation)
     logging.info('DONE: %s', volume_filename)

@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from typing import List
+from typing import Iterator
 
 from citation.intermediate_citation import IntermediateCitation
 from paragraph.paragraph import Paragraph, ParagraphType
 
 
-def assemble_citations(paragraphs: List[Paragraph]):
+def assemble_citations(paragraphs: Iterator[Paragraph]):
     current_keyword = None
     current_citation = None
 

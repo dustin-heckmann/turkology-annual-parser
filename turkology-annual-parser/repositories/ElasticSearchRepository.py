@@ -36,6 +36,7 @@ class ElasticSearchRepository(object):
         citations = map(lambda citation: {
             '_index': self._index,
             '_type': 'citation',
+            '_id': citation.id,
             **self._citation_as_dict(citation)
         }, citations)
         bulk(self._es, citations, chunk_size=70000, request_timeout=200)

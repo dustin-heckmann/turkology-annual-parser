@@ -21,6 +21,7 @@ class Person:
 
 @dataclass
 class Citation:
+    id: str = None
     volume: int = None
     number: int = None
     type: CitationType = None
