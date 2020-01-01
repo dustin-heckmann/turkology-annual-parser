@@ -8,7 +8,6 @@ def extract_paragraphs(volume_filename):
     volume_number = volume_from_filename(volume_filename)
     parser = WMLParser(volume_filename)
     for paragraph in parser:
-        print(paragraph)
         yield replace(paragraph, volume=volume_number)
 
 
