@@ -64,10 +64,16 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
         correct_volume_12(paragraphs)
     elif volume == 13:
         correct_volume_13(paragraphs)
+    elif volume == 15:
+        correct_volume_15(paragraphs)
     elif volume == 16:
         paragraphs = correct_volume_16(paragraphs)
+    elif volume == 18:
+        correct_volume_18(paragraphs)
     elif volume == 19:
         correct_volume_19(paragraphs)
+    elif volume == 20:
+        correct_volume_20(paragraphs)
     elif volume == 21:
         paragraphs = correct_volume_21(paragraphs)
     elif volume == 22:
@@ -94,6 +100,9 @@ def correct_volume_25(paragraphs):
 
 
 def correct_volume_24(paragraphs):
+    paragraphs[3498] = merge_paragraphs([paragraphs[3498], paragraphs[3502]])
+    empty_paragraphs(paragraphs, 3502, 3503)
+
     paragraphs = flatten_list([
         paragraphs[:726],
         [replace_text(' 262;.*', '', merge_paragraphs(paragraphs[726:729]))],
@@ -156,10 +165,30 @@ def correct_volume_21(paragraphs):
     ])
     return paragraphs
 
+def correct_volume_20(paragraphs):
+    empty_paragraphs(paragraphs, 2041, 2056)
 
 def correct_volume_19(paragraphs):
     paragraphs[3081] = replace_text('^Î48L', '1481.', paragraphs[3081])
 
+    paragraphs[1838] = merge_paragraphs(paragraphs[1838:1840])
+    empty_paragraphs(paragraphs, 1839, 1840)
+
+    paragraphs[1842] = merge_paragraphs(paragraphs[1842:1844])
+    empty_paragraphs(paragraphs, 1843, 1844)
+
+    paragraphs[3447] = merge_paragraphs([paragraphs[3447], paragraphs[3450]])
+    empty_paragraphs(paragraphs, 3450, 3451)
+
+def correct_volume_18(paragraphs):
+    paragraphs[2997] = merge_paragraphs(paragraphs[2997:2999])
+    empty_paragraphs(paragraphs, 2998, 2999)
+
+    paragraphs[3286] = merge_paragraphs(paragraphs[3286:3288])
+    empty_paragraphs(paragraphs, 3287, 3288)
+
+    paragraphs[3288] = merge_paragraphs(paragraphs[3288:3290])
+    empty_paragraphs(paragraphs, 3289, 3290)
 
 def correct_volume_16(paragraphs):
     paragraphs = flatten_list([
@@ -183,6 +212,14 @@ def correct_volume_16(paragraphs):
         paragraphs[465:]
     ])
     return paragraphs
+
+
+def correct_volume_15(paragraphs):
+    paragraphs[1890] = merge_paragraphs(paragraphs[1890:1892])
+    empty_paragraphs(paragraphs, 1891, 1892)
+
+    paragraphs[1900] = merge_paragraphs(paragraphs[1900:1902])
+    empty_paragraphs(paragraphs, 1901, 1902)
 
 
 def correct_volume_13(paragraphs):
@@ -270,6 +307,19 @@ def correct_volume_10(paragraphs):
 def correct_volume_9(paragraphs):
     empty_paragraphs(paragraphs, 2460, 2496)
     empty_paragraphs(paragraphs, 2538, 2559)
+
+    paragraphs[3885] = merge_paragraphs(paragraphs[3885:3887])
+    empty_paragraphs(paragraphs, 3886, 3887)
+
+    paragraphs[3899] = merge_paragraphs(paragraphs[3899:3901])
+    empty_paragraphs(paragraphs, 3900, 3901)
+
+    paragraphs[1519] = merge_paragraphs(paragraphs[1519:1521])
+    empty_paragraphs(paragraphs, 1520, 1521)
+
+    paragraphs[1521] = merge_paragraphs(paragraphs[1521:1523])
+    empty_paragraphs(paragraphs, 1522, 1523)
+
     paragraphs = flatten_list([
         paragraphs[:980],
         [replace_text(r"^' ", '', paragraphs[980])],
@@ -307,6 +357,13 @@ def correct_volume_7(paragraphs):
     empty_paragraphs(paragraphs, 3571, 3594)
     empty_paragraphs(paragraphs, 3620, 3646)
     empty_paragraphs(paragraphs, 4417, 4435)
+
+    paragraphs[1773] = merge_paragraphs([paragraphs[1773], paragraphs[1777]])
+    empty_paragraphs(paragraphs, 1777, 1778)
+
+    paragraphs[4240] = merge_paragraphs([paragraphs[4240], paragraphs[4243]])
+    empty_paragraphs(paragraphs, 4243, 4244)
+
     paragraphs = flatten_list([
         paragraphs[:2446],
         [replace_text('^.1245. LlU', '1245. Liu', paragraphs[2446])],
@@ -341,10 +398,19 @@ def correct_volume_6(paragraphs):
 
 
 def correct_volume_5(paragraphs):
+    empty_paragraphs(paragraphs, 844, 845)
     empty_paragraphs(paragraphs, 3289, 3306)
     empty_paragraphs(paragraphs, 4342, 4362)
     paragraphs[1281] = replace_text('^521ï', '521.', paragraphs[1281])
+    paragraphs[1661] = None
     paragraphs[2076] = replace_text('^1048', '1048.', paragraphs[2076])
+
+    paragraphs[2705] = merge_paragraphs(paragraphs[2705:2707])
+    empty_paragraphs(paragraphs, 2706, 2707)
+
+    paragraphs[3510] = merge_paragraphs([paragraphs[3510], paragraphs[3513]])
+    empty_paragraphs(paragraphs, 3511, 3512)
+
     paragraphs[3771] = replace_text('^2076', '2067', paragraphs[3771])
     paragraphs[4032] = replace_text('^2119', '2219', paragraphs[4032])
 
@@ -383,7 +449,6 @@ def correct_volume_2(paragraphs):
 
     paragraphs[3088] = merge_paragraphs(paragraphs[3088:3090])
     del paragraphs[3089]
-
 
 
 def correct_volume_1(paragraphs):
