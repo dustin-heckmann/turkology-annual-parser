@@ -199,7 +199,7 @@ def parse_title(citation: Union[Citation, IntermediateCitation]) -> Union[Citati
     citation = replace(citation)
     text = citation.remaining_text
     title_patterns = [
-        re.compile(r'{{{ authors }}}\s*(.+)\s*{{{ (?:in|editors|translators|number_of_volumes|location) }}}'),
+        re.compile(r'{{{ authors }}}\s*(.+?)\s*{{{ (?:in|editors|translators|number_of_volumes|location) }}}'),
         re.compile(r'{{{ authors }}}\s*([^.(]+?)[.,]?\s*{{{'),
         re.compile(
             r'^((?:[^.,(](?!{{{))+?)[.,]?\s*{{{ (?:in|editors|translators|number_of_volumes|comment|location) '

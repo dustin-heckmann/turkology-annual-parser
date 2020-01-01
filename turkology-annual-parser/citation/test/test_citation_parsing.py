@@ -1,5 +1,5 @@
 from citation.citation import CitationType, Citation, Person
-from citation.citation_parsing import parse_citation, find_known_authors, reparse_citation
+from citation.citation_parsing import parse_citation, find_known_authors
 from citation.field_parsing import parse_citation_fields
 from citation.intermediate_citation import IntermediateCitation
 
@@ -66,6 +66,18 @@ def test_find_known_authors():
                       'raw': 'POF 20-21.1970/71 (1974).213-221'}, ta_references=[],
         remaining_text='{{{ authors }}} {{{ title }}}{{{ in }}}'
     )
+
+
+def test_find_title_before_field_marker():
+    raw_text = '1667. ArsenijeviĆ, Lazar-Batalaka     Istorija srpskog ustanka. Vladimir stojancević ed. Beograd, 1979, 1 S.'
+    parsed_citation = parse_citation_and_fields(raw_text)
+    assert parsed_citation.title == 'Istorija srpskog ustanka'
+
+
+def parse_citation_and_fields(raw_text):
+    raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
+    parsed_citation = parse_citation_fields(parse_citation(raw_citation))
+    return parsed_citation
 
 
 def test_does_not_crash():
