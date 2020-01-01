@@ -178,6 +178,8 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             paragraphs[4849:]
         ])
     elif volume == 11:
+        empty_paragraphs(paragraphs, 2007, 2032)
+        empty_paragraphs(paragraphs, 2219, 2242)
         paragraphs = flatten_list([
             paragraphs[:649],
             [replace_text(r'^\^209', '209', paragraphs[649])],
@@ -190,6 +192,15 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             [replace_text(r'^j2Ö6\|', '2061.', paragraphs[3822])],
             paragraphs[3823:],
         ])
+    elif volume == 12:
+        empty_paragraphs(paragraphs, 2249, 2274)
+        empty_paragraphs(paragraphs, 3140, 3158)
+        empty_paragraphs(paragraphs, 3158, 3177)
+    elif volume == 13:
+        empty_paragraphs(paragraphs, 1404, 1425)
+        empty_paragraphs(paragraphs, 4287, 4312)
+        empty_paragraphs(paragraphs, 4382, 4407)
+
     elif volume == 16:
         paragraphs = flatten_list([
             paragraphs[:349],
