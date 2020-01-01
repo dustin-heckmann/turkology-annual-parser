@@ -31,12 +31,21 @@ def flatten_list(list_of_lists):
     return [item for sublist in list_of_lists for item in sublist]
 
 
+def empty_paragraphs(paragraphs, lower_bound, upper_bound):
+    for i in range(lower_bound, upper_bound):
+        paragraphs[i] = None
+
+
 def correct_paragraphs(paragraphs: List[Paragraph]):
     volume = paragraphs[0].volume
-    if volume == '2':
+    if volume == 1:
+        empty_paragraphs(paragraphs, 779, 798)  # duplicate page
+        empty_paragraphs(paragraphs, 1912, 1932)  # duplicate page
+        empty_paragraphs(paragraphs, 2306, 2324)  # duplicate page
+    elif volume == 2:
         paragraphs[3088] = merge_paragraphs(paragraphs[3088:3090])
         del paragraphs[3089]
-    elif volume == '3':
+    elif volume == 3:
         before_1364, paragraph_1364 = split_paragraph_before(paragraphs[2589], '1364 Recueil')
         paragraph_1364 = replace_text('^1364', '1364.', paragraph_1364)
 
@@ -49,12 +58,19 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             [before_1364, paragraph_1364],
             paragraphs[2590:]
         ])
-    elif volume == '5':
+    elif volume == 4:
+        empty_paragraphs(paragraphs, 1728, 1748)
+        empty_paragraphs(paragraphs, 3127, 3152)
+    elif volume == 5:
+        empty_paragraphs(paragraphs, 3289, 3306)
+        empty_paragraphs(paragraphs, 4342, 4362)
         paragraphs[1281] = replace_text('^521ï', '521.', paragraphs[1281])
         paragraphs[2076] = replace_text('^1048', '1048.', paragraphs[2076])
         paragraphs[3771] = replace_text('^2076', '2067', paragraphs[3771])
         paragraphs[4032] = replace_text('^2119', '2219', paragraphs[4032])
-    elif volume == '6':
+    elif volume == 6:
+        empty_paragraphs(paragraphs, 2868, 2885)
+        empty_paragraphs(paragraphs, 4916, 4933)
         paragraphs[1472] = replace_text('^63δ', '635', paragraphs[1472])
         paragraphs[2695] = replace_text('^J397', '1397', paragraphs[2695])
         paragraphs[3029] = replace_text('^Í596', '1596', paragraphs[3029])
@@ -65,7 +81,10 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             paragraphs[1969:]
         ]
         )
-    elif volume == '7':
+    elif volume == 7:
+        empty_paragraphs(paragraphs, 3571, 3594)
+        empty_paragraphs(paragraphs, 3620, 3646)
+        empty_paragraphs(paragraphs, 4417, 4435)
         paragraphs = flatten_list([
             paragraphs[:2446],
             [replace_text('^.1245. LlU', '1245. Liu', paragraphs[2446])],
@@ -79,7 +98,8 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             [replace_text(r'^2196:', '2196.', paragraphs[4123])],
             paragraphs[4124:]
         ])
-    elif volume == '8':
+    elif volume == 8:
+        empty_paragraphs(paragraphs, 3161, 3181)
         paragraphs = flatten_list([
             paragraphs[:2381],
             split_paragraph_before(
@@ -97,7 +117,9 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             [replace_text(r'^.+?3\.', '2083.', paragraphs[3749])],
             paragraphs[3750:]
         ])
-    elif volume == '9':
+    elif volume == 9:
+        empty_paragraphs(paragraphs, 2460, 2496)
+        empty_paragraphs(paragraphs, 2538, 2559)
         paragraphs = flatten_list([
             paragraphs[:980],
             [replace_text(r"^' ", '', paragraphs[980])],
@@ -106,7 +128,11 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             split_paragraph_before(paragraphs[3351], '1606.'),
             paragraphs[3352:]
         ])
-    elif volume == '10':
+    elif volume == 10:
+        empty_paragraphs(paragraphs, 1008, 1029)
+        empty_paragraphs(paragraphs, 1071, 1091)
+        empty_paragraphs(paragraphs, 3388, 3408)
+        empty_paragraphs(paragraphs, 4575, 4595)
         paragraphs = flatten_list([
             paragraphs[:461],
             [merge_paragraphs([paragraphs[461], paragraphs[465]])],
@@ -151,7 +177,7 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             paragraphs[4845:4848],
             paragraphs[4849:]
         ])
-    elif volume == '11':
+    elif volume == 11:
         paragraphs = flatten_list([
             paragraphs[:649],
             [replace_text(r'^\^209', '209', paragraphs[649])],
@@ -164,7 +190,7 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             [replace_text(r'^j2Ö6\|', '2061.', paragraphs[3822])],
             paragraphs[3823:],
         ])
-    elif volume == '16':
+    elif volume == 16:
         paragraphs = flatten_list([
             paragraphs[:349],
             [replace_text(
@@ -185,9 +211,9 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             ),
             paragraphs[465:]
         ])
-    elif volume == '19':
+    elif volume == 19:
         paragraphs[3081] = replace_text('^Î48L', '1481.', paragraphs[3081])
-    elif volume == '21':
+    elif volume == 21:
         paragraphs = flatten_list([
             paragraphs[:2180],
             split_paragraph_before(
@@ -206,7 +232,7 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             )],
             paragraphs[2618:]
         ])
-    elif volume == '22-23':
+    elif volume == 22:
         paragraphs = flatten_list([
             paragraphs[:1161],
             [replace_text('^542·', '542.', paragraphs[1161])],
@@ -215,7 +241,7 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             paragraphs[4664:6084],
             paragraphs[6124:]
         ])
-    elif volume == '24':
+    elif volume == 24:
         paragraphs = flatten_list([
             paragraphs[:726],
             [replace_text(' 262;.*', '', merge_paragraphs(paragraphs[726:729]))],
@@ -242,7 +268,7 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             split_paragraph_before(paragraphs[4912], '2774.'),
             paragraphs[4913:]
         ])
-    elif volume == '25':
+    elif volume == 25:
         paragraphs = flatten_list([
             paragraphs[:3771],
             [merge_paragraphs([
@@ -253,7 +279,7 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
             [replace_text(r'^.+?1992\.', '1992.', paragraphs[3775])],
             paragraphs[3776:]
         ])
-    return paragraphs
+    return filter(lambda x: x is not None, paragraphs)
 
 
 def merge_paragraphs(paragraphs):
