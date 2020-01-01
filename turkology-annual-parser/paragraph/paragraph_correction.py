@@ -70,6 +70,7 @@ def correct_paragraphs(paragraphs: List[Paragraph]):
         paragraphs[4032] = replace_text('^2119', '2219', paragraphs[4032])
     elif volume == 6:
         empty_paragraphs(paragraphs, 2868, 2885)
+        empty_paragraphs(paragraphs, 3643, 3662)
         empty_paragraphs(paragraphs, 4916, 4933)
         paragraphs[1472] = replace_text('^63δ', '635', paragraphs[1472])
         paragraphs[2695] = replace_text('^J397', '1397', paragraphs[2695])
