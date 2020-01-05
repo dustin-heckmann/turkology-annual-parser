@@ -61,7 +61,7 @@ def parse_comment(citation: IntermediateCitation) -> IntermediateCitation:
     citation = replace(citation)
     text = citation.remaining_text
     comment_pattern = re.compile(r'\[([^\]]+)\]\.?( {{{ reviews }}})?$')
-    ta_references_pattern = re.compile(r's\. (?:TA \d(?:-\d+)?\.\d+)(?:, \d(?:-\d+)?\.\d+)*')
+    ta_references_pattern = re.compile(r's\. (?:TA \d+(?:-\d+)?\.\d+)(?:, \d(?:-\d+)?\.\d+)*')
     comment_match = comment_pattern.search(text)
     if comment_match:
         comment = comment_match.group(1).strip().rstrip('.')
