@@ -32,6 +32,7 @@ goal_build() {
   $PIP install -r requirements.txt
 }
 
+
 ##DOC clean: remove virtual environment
 goal_clean() {
   rm -rf $VENV_DIR_TA
@@ -40,14 +41,25 @@ goal_clean() {
 ##DOC run: run the application
 goal_run() {
   venv
-  echo "Running..."
+  echo "Starting..."
   $PYTHON $SOURCE_DIR/main.py --ocr-file $OCR_FILES --keyword-file $KEYWORDS_FILE \
   --find-authors \
   --resolve-repetitions
 }
 
+##DOC build-in-docker: build the application inside a docker container
+goal_build-docker() {
+  pip install -r requirements.txt
+}
 
-##DOC venv: open virtual environment (requires virtualenv)
+##DOC run-docker: run the application inside a docker container
+goal_run-docker() {
+  echo "Starting..."
+  python $SOURCE_DIR/main.py --ocr-file $OCR_FILES --keyword-file $KEYWORDS_FILE \
+  --find-authors \
+  --resolve-repetitions
+}
+
 
 if type -t "goal_$1" &>/dev/null; then
   "goal_$1" "${@:2}"
