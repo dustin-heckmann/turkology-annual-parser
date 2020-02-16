@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 set -e -o pipefail
 
-##DOC test: runs all tests
+export PYTHONPATH=$PYTHONPATH:$(pwd)/turkology-annual-parser
+
+##DOC test: run all tests
 goal_test() {
-  ./go build && py.test
+  ./go build && python -m pytest
 }
 
 ##DOC build: build the application
@@ -11,7 +13,7 @@ goal_build() {
   pip install -r requirements.txt
 }
 
-##DOC run: runs the application
+##DOC run: run the application
 goal_run() {
   ./go build && ./run.sh
 }
