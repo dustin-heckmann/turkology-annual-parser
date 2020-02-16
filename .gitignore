@@ -89,6 +89,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+venv_ta_parser/
 
 # Spyder project settings
 .spyderproject

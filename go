@@ -2,21 +2,52 @@
 set -e -o pipefail
 
 export PYTHONPATH=$PYTHONPATH:$(pwd)/turkology-annual-parser
+VENV_DIR_TA=venv_ta_parser
+PYTHON=$VENV_DIR_TA/bin/python
+PIP=$VENV_DIR_TA/bin/pip
+SOURCE_DIR=turkology-annual-parser
+OCR_FILES=data/ocr/*.xml
+KEYWORDS_FILE=data/keywords.csv
+
+venv() {
+  if [[ ! -d $VENV_DIR_TA ]]; then
+  echo "Initializing virtualenv in $VENV_DIR_TA/..."
+  echo
+    virtualenv $VENV_DIR_TA -p python3
+  else
+    echo "Virtualenv already exists at $VENV_DIR_TA, skipping initialization."
+    echo "To start from a clean state, run ./go clean"
+    echo
+  fi
+}
 
 ##DOC test: run all tests
 goal_test() {
-  ./go build && python -m pytest
+  ./go build && $PYTHON -m pytest
 }
 
 ##DOC build: build the application
 goal_build() {
-  pip install -r requirements.txt
+  venv
+  $PIP install -r requirements.txt
+}
+
+##DOC clean: remove virtual environment
+goal_clean() {
+  rm -rf $VENV_DIR_TA
 }
 
 ##DOC run: run the application
 goal_run() {
-  ./go build && ./run.sh
+  venv
+  echo "Running..."
+  $PYTHON $SOURCE_DIR/main.py --ocr-file $OCR_FILES --keyword-file $KEYWORDS_FILE \
+  --find-authors \
+  --resolve-repetitions
 }
+
+
+##DOC venv: open virtual environment (requires virtualenv)
 
 if type -t "goal_$1" &>/dev/null; then
   "goal_$1" "${@:2}"
