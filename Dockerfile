@@ -6,4 +6,4 @@ COPY data /data/
 COPY go /
 
 RUN ./go build-docker
-ENTRYPOINT ["./go run-docker"]
+ENTRYPOINT ["./go", "run-docker"]
