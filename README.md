@@ -1,7 +1,15 @@
 # turkology-annual-parser
-Parser for Turkology Annual Online
+Parser for Turkology Annual Online.
+
+Parses OCR output (WordprocessingML) and stores resulting citations in an [Elasticsearch](https://www.elastic.co/elasticsearch) index.
  
-[About Turkology Annual Online](http://www.asia-europe.uni-heidelberg.de/en/research/heidelberg-research-architecture/projects/turkology-annual.html)
+The OCR output was obtained in the
+[Turkology Annual Online](http://www.asia-europe.uni-heidelberg.de/en/research/heidelberg-research-architecture/projects/turkology-annual.html)
+project at [Heidelberg University](https://www.uni-heidelberg.de/), Cluster "Asia and Europe in a Global Context".
+
+The Turkology Annual is published by the
+[Department of Oriental Studies](https://orientalistik.univie.ac.at)
+of the [University of Vienna](https://www.univie.ac.at/).
 
 ### Requirements
 * [Python 3.7+](https://www.python.org/)
@@ -14,5 +22,3 @@ Parser for Turkology Annual Online
 To run the parser, a running Elasticsearch instance is required.
 
 ```./go run```
-
-
