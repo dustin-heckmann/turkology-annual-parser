@@ -49,7 +49,7 @@ def parse_amendments_or_comments(texts):
         bullet_pattern = re.compile(r'^[•φ#0Φ]\s+')  # , s\.( a\.)? \d+')
         amendment_string = re.sub(bullet_pattern, '', amendment_string)
         if amendment_string and amendment_string.startswith('Rez.'):
-            amendment_string = re.sub('^Rez\. *', '', amendment_string)
+            amendment_string = re.sub(r'^Rez\. *', '', amendment_string)
             reviews.extend(re.split(r'\s+—\s+', amendment_string))
         else:
             unparseable_amendments.append(amendment_string)
@@ -88,7 +88,7 @@ def parse_name(name):
 
 def parse_ta_references(reference_string):
     if not reference_string: return []
-    reference_string = re.sub('^s\. TA ', '', reference_string)
+    reference_string = re.sub(r'^s\. TA ', '', reference_string)
     reference_strings = re.split(', ', reference_string)
     references = []
     for reference_string in reference_strings:
@@ -104,14 +104,14 @@ def parse_amendments(amendment_strings):
     return amendment_strings
 
 
-year_pattern = '(?:(?P<year>\d{4})|(?P<yearStart>\d{4})[-—/](?P<yearEnd>\d{2}(?:\d{2})?))(?: *\((?P<yearParentheses>\d{4})\))?'
-pages_pattern = '(?:S\. ?)?(?P<pageStart>\d+)(?:[-—](?P<pageEnd>\d+))?'
-issues_pattern = '(?:(?P<issue>\d{1,3})|(?P<issueStart>\d{1,3})[-—](?P<issueEnd>\d{1,3}))'
-volume_pattern = '(?:(?P<volume>\d{1,2})|(?P<volumeStart>\d{1,2})[-—](?P<volumeEnd>\d{1,2}))'
-journal_pattern = '(?P<journal>(?:[^\W\d_]|[\- ])+?)'
+year_pattern = r'(?:(?P<year>\d{4})|(?P<yearStart>\d{4})[-—/](?P<yearEnd>\d{2}(?:\d{2})?))(?: *\((?P<yearParentheses>\d{4})\))?'
+pages_pattern = r'(?:S\. ?)?(?P<pageStart>\d+)(?:[-—](?P<pageEnd>\d+))?'
+issues_pattern = r'(?:(?P<issue>\d{1,3})|(?P<issueStart>\d{1,3})[-—](?P<issueEnd>\d{1,3}))'
+volume_pattern = r'(?:(?P<volume>\d{1,2})|(?P<volumeStart>\d{1,2})[-—](?P<volumeEnd>\d{1,2}))'
+journal_pattern = r'(?P<journal>(?:[^\W\d_]|[\- ])+?)'
 
 reference_patterns = [
-    ('ta', re.compile('^TA *(?P<volume>\d+)\. *(?P<number>\d+)(?:\. *%s)?$' % pages_pattern)),
+    ('ta', re.compile(r'^TA *(?P<volume>\d+)\. *(?P<number>\d+)(?:\. *%s)?$' % pages_pattern)),
 
     # ('volume.issue.year.pages', re.compile('^ *%s *%s\. *%s\. *%s$' % (year_pattern, issues_pattern, pages_pattern))),  # volume.issue.year.pages
     # ('year.issue.pages', re.compile('^(?P<journal>[\w ]+?) *%s\. *%s\. *%s$' % (year_pattern, issues_pattern, pages_pattern))),  # year.issue.pages
@@ -119,7 +119,7 @@ reference_patterns = [
     # ('year.pages', re.compile('^(?P<journal>[\w ]+?) *%s. *%s$' % (year_pattern, pages_pattern))),  # year.pages
 ]
 reference_patterns.extend(
-    [('journal', re.compile('^' + journal_pattern + ' *' + '\. *'.join(sub_patterns) + '$', re.UNICODE)) for
+    [('journal', re.compile('^' + journal_pattern + ' *' + r'\. *'.join(sub_patterns) + '$', re.UNICODE)) for
      sub_patterns in [
          (volume_pattern, issues_pattern, year_pattern, pages_pattern),
          (volume_pattern, issues_pattern, pages_pattern),
@@ -155,16 +155,16 @@ def parse_reference(raw_reference):
 def parse_material(material):
     if not isinstance(material, str):
         return material
-    match = re.match('(\d+) *(.+)', material)
+    match = re.match(r'(\d+) *(.+)', material)
     if not match:
         return material
     count = match.group(1)
     material_types = {
-        '(?:Tab\.|Tabellen?|Tafeln?)': 'table',
+        r'(?:Tab\.|Tabellen?|Tafeln?)': 'table',
         '(?:Karten?)': 'map',
         '(?:Falt(?:karten?|plan|pläne))': 'fold-up map',
         '(?:Falttabellen?)': 'fold-up table',
-        '(?:Abb\.)': 'figure',
+        r'(?:Abb\.)': 'figure',
     }
     for type_pattern, type_name in material_types.items():
         if re.match(type_pattern, match.group(2)):
@@ -191,7 +191,7 @@ def parse_date(date_str):
         return date_str
 
     match = re.match(
-        '(?:(\d{1,2})\. *(?:([IVX]{1,4})\. *)?(\d{4})?[-—])?(\d{1,2})\. *([IVX]{1,4})\. *(\d{4})',
+        r'(?:(\d{1,2})\. *(?:([IVX]{1,4})\. *)?(\d{4})?[-—])?(\d{1,2})\. *([IVX]{1,4})\. *(\d{4})',
         date_str
     )
 
