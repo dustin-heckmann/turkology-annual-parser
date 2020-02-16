@@ -64,7 +64,7 @@ def parse_reviews(review_str):
 
 def parse_authors(authors):
     if authors:
-        return list(map(parse_name, re.split('[—-]', authors)))
+        return list(map(parse_name, re.split(r'(?:—| +- +)', authors)))
     return []
 
 

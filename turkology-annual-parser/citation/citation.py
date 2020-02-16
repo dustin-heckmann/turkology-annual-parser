@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import List
@@ -47,4 +48,7 @@ class Citation:
     series: str = None
     date: dict = None
     remaining_text: str = None
-    fully_parsed: bool = None
+
+    def fully_parsed(self) -> bool:
+        fully_parsed_pattern = re.compile(r'({{{\s*[\w_]+\s*}}}[., ]*)+')
+        return fully_parsed_pattern.fullmatch(self.remaining_text) is not None

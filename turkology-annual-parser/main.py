@@ -4,7 +4,7 @@ import logging
 import multiprocessing
 import os
 from multiprocessing.queues import Queue
-from typing import Dict, List
+from typing import Dict, List, Set
 
 from citation.assembly import assemble_citations
 from citation.citation import Citation
@@ -39,17 +39,37 @@ def main():
     save_citations(citations)
 
 
+HARDCODED_AUTHORS = {
+    'Condurachi, Em',
+    'Kakük, Z',
+    'Yoman, Yakut',
+    'Kobeneva, T. A',
+    'Djukanovic, Marija',
+    'Zagorka Janc',
+    'Sohbweide, Hanna',
+    'Tübkay, Cevdet',
+    'Eren, ismail',
+    'Baysal,   Jale',
+    'Spiridonakis, B. G',
+    'Uçankuş, Hasan T',
+    'Landau, Jacob M',
+    'Özeğe, Seyfettin',
+
+}
+
+
 def find_authors(citations: List[Citation]):
     known_authors = get_known_authors_from_citations(citations)
+    known_authors.update(HARDCODED_AUTHORS)
     logging.info('Found {} distinct authors'.format(len(known_authors)))
     return find_known_authors(citations, known_authors)
 
 
-def get_known_authors_from_citations(citations: List[Citation]):
+def get_known_authors_from_citations(citations: List[Citation]) -> Set[str]:
     known_authors = set()
     for citation in citations:
         for author in citation.authors:
-            known_authors.add(author.raw.strip().lower())
+            known_authors.add(author.raw)
     return known_authors
 
 

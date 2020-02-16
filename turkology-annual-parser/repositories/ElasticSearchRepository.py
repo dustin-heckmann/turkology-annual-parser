@@ -43,10 +43,9 @@ class ElasticSearchRepository(object):
 
     @staticmethod
     def _citation_as_dict(citation: Citation):
-        return asdict(
-            replace(citation, type=citation.type.value if citation.type else None),
-            dict_factory=to_dict
-        )
+        citation_dict = asdict(replace(citation, type=citation.type.value if citation.type else None), dict_factory=to_dict)
+        citation_dict['fullyParsed'] = citation.fully_parsed()
+        return citation_dict
 
 
 def to_dict(it):

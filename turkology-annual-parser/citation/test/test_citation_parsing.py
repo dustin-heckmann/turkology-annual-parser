@@ -12,7 +12,6 @@ def test_parse_citation():
     parsed_citation = parse_citation(raw_citation)
 
     assert parsed_citation == IntermediateCitation(
-        fully_parsed=True,
         remaining_text='{{{ title }}}.  {{{ editors }}}   {{{ number_of_volumes }}} '
                        '{{{ location }}} {{{ date_published }}}{{{ series }}}.',
         raw_text='1. Lexikon der islamischen Welt. Klaus Kreiser, Werner Diem, Hans '
@@ -39,7 +38,6 @@ def test_parse_collection():
         volume=1, number='98', type=CitationType.COLLECTION,
         editors='Michael Rywkin',
         remaining_text='Russian colonial expansion to 1917. Eingeleitet von Sy ed Z. abedin.  {{{ editors }}}  London, 1988, XVΠ+274 S.',
-        fully_parsed=False,
         raw_text=raw_text
     )
 
@@ -64,7 +62,7 @@ def test_find_known_authors():
         published_in={'journal': 'POF', 'volumeStart': 20, 'volumeEnd': 21, 'yearStart': 1970, 'yearEnd': 1971,
                       'yearParentheses': 1974, 'pageStart': 213, 'pageEnd': 221, 'type': 'journal',
                       'raw': 'POF 20-21.1970/71 (1974).213-221'}, ta_references=[],
-        remaining_text='{{{ authors }}} {{{ title }}}{{{ in }}}'
+        remaining_text='{{{ authors }}} {{{ title }}} {{{ in }}}'
     )
 
 

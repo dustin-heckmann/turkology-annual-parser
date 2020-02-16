@@ -12,7 +12,6 @@ from citation.field_parsing import parse_name
 from citation.intermediate_citation import IntermediateCitation
 
 number_rest_pattern = re.compile(r'(\d+)\.\s*(.+)', re.DOTALL)
-fully_parsed_pattern = re.compile(r'({{{\s*[\w_]+\s*}}}[., ]*)+')
 
 
 def parse_citation(raw_citation: IntermediateCitation) -> IntermediateCitation:
@@ -37,8 +36,7 @@ def parse_citation(raw_citation: IntermediateCitation) -> IntermediateCitation:
             parse_title,
     ):
         citation = parse_function(citation)
-        fully_parsed = fully_parsed_pattern.fullmatch(citation.remaining_text) is not None
-    return replace(citation, fully_parsed=fully_parsed)
+    return citation
 
 
 def parse_review(citation: IntermediateCitation) -> IntermediateCitation:
@@ -296,7 +294,7 @@ def find_multiple_authors(citation: Citation, known_authors_pattern) -> Optional
 
 
 def find_known_authors(citations: List[Citation], known_authors: Iterator[str]) -> Iterator[Citation]:
-    known_authors_pattern = '|'.join([re.escape(author) for author in known_authors])
+    known_authors_pattern = '|'.join([re.escape(author.strip().lower()) for author in known_authors])
     for citation in citations:
         if not citation.authors:
             citation = (
@@ -325,7 +323,5 @@ def find_authors(citation: Citation, known_authors_pattern) -> Optional[Citation
         author_name = author_match.group(1)
         remaining_text = '{{{ authors }}} ' + citation.remaining_text[author_match.span(2)[0]:]
         citation.remaining_text = remaining_text
-        if fully_parsed_pattern.fullmatch(remaining_text):
-            citation.fully_parsed = True
         citation.authors = [parse_name(author_name)]
         return citation

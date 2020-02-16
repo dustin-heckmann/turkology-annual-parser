@@ -3,7 +3,6 @@ from citation.field_parsing import parse_citation_fields
 from citation.intermediate_citation import IntermediateCitation
 
 CITATION = IntermediateCitation(
-    fully_parsed=True,
     remaining_text='{{{ title }}}.  {{{ editors }}}   {{{ number_of_volumes }}} '
                    '{{{ location }}} {{{ date_published }}}{{{ series }}}.',
     raw_text='1. Lexikon der islamischen Welt. Klaus Kreiser, Werner Diem, Hans '

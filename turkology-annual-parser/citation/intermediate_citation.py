@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass, field
 from typing import List
 
@@ -31,5 +32,9 @@ class IntermediateCitation:
     remaining_text: str = None
     page_start: str = None
     page_end: str = None
-    fully_parsed: bool = False
     raw_text: str = None
+
+    @property
+    def fully_parsed(self) -> bool:
+        fully_parsed_pattern = re.compile(r'({{{\s*[\w_]+\s*}}}[., ]*)+')
+        return fully_parsed_pattern.fullmatch(self.remaining_text) is not None
