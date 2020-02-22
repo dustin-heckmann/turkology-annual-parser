@@ -94,7 +94,7 @@ def parse_ta_references(reference_string):
     for reference_string in reference_strings:
         reference_parts = reference_string.split('.')
         references.append({
-            'volume': int(reference_parts[0]) if reference_parts[0].isdigit() else reference_parts[0],
+            'volume': int(reference_parts[0].split('-')[0]),  # 'TA22-23' --> 22
             'number': int(reference_parts[1]),
         })
     return references
