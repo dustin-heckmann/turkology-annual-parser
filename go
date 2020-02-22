@@ -6,7 +6,7 @@ VENV_DIR_TA=venv_ta_parser
 PYTHON=$VENV_DIR_TA/bin/python
 PIP=$VENV_DIR_TA/bin/pip
 SOURCE_DIR=turkology-annual-parser
-OCR_FILES=data/ocr/*.xml
+OCR_FILES=data/ocr/*
 KEYWORDS_FILE=data/keywords.csv
 
 venv() {
@@ -32,7 +32,6 @@ goal_build() {
   $PIP install -r requirements.txt
 }
 
-
 ##DOC clean: remove virtual environment
 goal_clean() {
   rm -rf $VENV_DIR_TA
@@ -49,6 +48,7 @@ goal_run() {
 
 ##DOC build-in-docker: build the application inside a docker container
 goal_build-docker() {
+  pip install --upgrade pip
   pip install -r requirements.txt
 }
 
