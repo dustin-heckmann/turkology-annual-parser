@@ -16,12 +16,13 @@ from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
 from repetitions import add_repeated_info
-from repositories.ElasticSearchRepository import ElasticSearchRepository
+from repositories.JsonRepository import JsonRepository
 
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('--ocr-files', nargs='*', help='Location of OCR directory', required=True)
+    parser.add_argument('--input', '-i', nargs='*', help='Location of OCR directory', required=True)
+    parser.add_argument('--output', '-o',  help='Location of JSON output file', required=True)
     parser.add_argument('--keyword-file', help='Path to keyword CSV', required=True)
     parser.add_argument('--find-authors', action='store_true')
     parser.add_argument('--resolve-repetitions', action='store_true')
@@ -30,13 +31,13 @@ def main():
     args = parser.parse_args()
     setup_logging(args.verbose)
 
-    citations = run_full_pipeline(args.ocr_files, args.keyword_file)
+    citations = run_full_pipeline(args.input, args.keyword_file)
 
     if args.find_authors:
         citations = find_authors(citations)
     if args.resolve_repetitions:
         citations = resolve_repetitions(citations)
-    save_citations(citations)
+    save_citations(citations, args.output)
 
 
 HARDCODED_AUTHORS = {
@@ -78,12 +79,10 @@ def resolve_repetitions(citations: List[Citation]):
     return add_repeated_info(citations)
 
 
-def save_citations(citations: List[Citation]):
-    index_repository = ElasticSearchRepository(
-        host=os.getenv('ELASTIC_HOST', 'localhost'),
-        index=os.getenv('ELASTIC_INDEX', 'citations')
-    )
-    index_repository.insert_citations(citations)
+def save_citations(citations: List[Citation], output_filename: str):
+    os.makedirs(os.path.dirname(output_filename), exist_ok=True)
+    repository = JsonRepository(output_filename)
+    repository.write_citations(citations)
 
 
 def run_full_pipeline(

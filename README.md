@@ -1,7 +1,7 @@
 # turkology-annual-parser
 Parser for Turkology Annual Online.
 
-Parses OCR output (WordprocessingML) and stores resulting citations in an [Elasticsearch](https://www.elastic.co/elasticsearch) index.
+Parses OCR output (WordprocessingML) and stores resulting citations in a JSON file.
  
 The OCR output was obtained in the
 [Turkology Annual Online](http://www.asia-europe.uni-heidelberg.de/en/research/heidelberg-research-architecture/projects/turkology-annual.html)
@@ -19,6 +19,5 @@ of the [University of Vienna](https://www.univie.ac.at/).
 ```./go test```
 
 ### Start application
-To run the parser, a running Elasticsearch instance is required.
 
 ```./go run```
