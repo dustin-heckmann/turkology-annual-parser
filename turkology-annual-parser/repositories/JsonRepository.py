@@ -15,10 +15,5 @@ class JsonRepository(BaseRepository):
             json.dump(
                 list(map(self._citation_as_dict, citations)),
                 storage_file,
-                default=date_converter
             )
 
-
-def date_converter(o):
-    if isinstance(o, datetime.date):
-        return o.__str__()

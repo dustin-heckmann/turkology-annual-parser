@@ -206,12 +206,12 @@ def parse_date(date_str):
         year_start = int(match.group(3)) if match.group(3) else year_end
 
         try:
-            date_start = date(year_start, month_start, day_start)
+            date_start = str(date(year_start, month_start, day_start))
         except ValueError:
             print([year_start, month_start, day_start])
             date_start = None
         try:
-            date_end = date(year_end, month_end, day_end)
+            date_end = str(date(year_end, month_end, day_end))
         except ValueError:
             date_end = None
 
