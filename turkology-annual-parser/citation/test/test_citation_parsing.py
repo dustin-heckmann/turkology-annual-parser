@@ -72,10 +72,23 @@ def test_find_title_before_field_marker():
     assert parsed_citation.title == 'Istorija srpskog ustanka'
 
 
+def test_13_1584():
+    raw_text = '1584. Mehrländer, Ursula     Türkische Jugendliche - keine beruflichen Chancen in Deutschland? Bonn, 1983, 228S.'
+    parsed_citation = parse_citation_and_fields(raw_text)
+    assert parsed_citation.location == 'Bonn'
+    assert parsed_citation.date_published == {'year': 1983}
+    assert parsed_citation.number_of_pages == '228'
+    assert parsed_citation.title == 'Türkische Jugendliche - keine beruflichen Chancen in Deutschland?'
+    assert parsed_citation.authors[0].first == 'Ursula'
+    assert parsed_citation.authors[0].last == 'Mehrländer'
+    assert parsed_citation.fully_parsed()
+
+
 def parse_citation_and_fields(raw_text):
     raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
     parsed_citation = parse_citation_fields(parse_citation(raw_citation))
     return parsed_citation
+
 
 
 def test_does_not_crash():

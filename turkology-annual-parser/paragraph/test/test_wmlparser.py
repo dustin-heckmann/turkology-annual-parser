@@ -48,4 +48,4 @@ def test_parser_returns_specific_paragraphs_vol_26():
     ]
 
 
-def get_xml_path(filename): return os.path.join(os.path.dirname(__file__), '../../../data/ocr/', filename)
+def get_xml_path(filename): return os.path.join(os.path.dirname(__file__), '../../../ta-data/ocr/', filename)

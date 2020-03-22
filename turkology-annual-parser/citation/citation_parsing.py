@@ -130,17 +130,36 @@ def parse_location_year_pages(citation: IntermediateCitation) -> IntermediateCit
     citation = replace(citation)
     text = citation.remaining_text
     loc_year_pages_pattern = re.compile(
-        r'([.,]) +\[?([^,.]+), *\[?(\d{4})\]?, *(?:([\d +DCLIVX]+) *[Ss]\.|[Ss]\. (\d+)\s*[-—]\s*(\d+))'
+        r'([.,?]) +\[?'
+        r'([^,.?]+)'  # location
+        r', *\[?'  # comma, 0+ spaces, maybe opening square bracket
+        r'(\d{4})'  # date_published
+        r'\]?, *'
+        r'(?:'
+        r'([\d +DCLIVX]+)'  # number of pages (arabic / roman)
+        r' *[Ss]\.|[Ss]\. '  # S. (abbreviation for "Seiten")
+        r'(\d+)'  # pageStart
+        r'\s*[-—]\s*'
+        r'(\d+))'  # pageEnd
     )
     loc_year_pages_match = loc_year_pages_pattern.search(text)
     if loc_year_pages_match:
+        # Location
         citation.location = loc_year_pages_match.group(2).strip()
+
+        # datePublished
         citation.date_published = loc_year_pages_match.group(3)
+
         if loc_year_pages_match.group(4):
+            # numberOfPages
             citation.number_of_pages = loc_year_pages_match.group(4).strip()
         else:
+            # pageStart
             citation.page_start = loc_year_pages_match.group(5)
+
+            # pageEnd
             citation.page_end = loc_year_pages_match.group(6)
+
         text = text[:loc_year_pages_match.span()[0]] \
                + loc_year_pages_match.group(1) \
                + ' {{{ location }}} {{{ date_published }}} {{{ number_of_pages }}}' \
