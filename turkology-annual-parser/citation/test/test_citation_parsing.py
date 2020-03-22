@@ -84,11 +84,31 @@ def test_13_1584():
     assert parsed_citation.fully_parsed()
 
 
+def test_12_2023():
+    citation = parse_citation_and_fields(
+        '2032. Zieme, Peter    A title. Berlin, 1984. 255 S. (Berliner Turfantexte, 13).'
+    )
+    assert citation.location == 'Berlin'
+    assert citation.date_published == {'year': 1984}
+    assert citation.number_of_pages == '255'
+
+
+def test_ta_reference():
+    raw_text = '1. Smith, Mary     Some nice title. In: TA 26.298.61-67.'
+    parsed_citation = parse_citation_and_fields(raw_text)
+    assert parsed_citation.published_in['volume'] == 26
+    assert parsed_citation.published_in['number'] == 298
+    assert parsed_citation.published_in['pageStart'] == 61
+    assert parsed_citation.published_in['pageEnd'] == 67
+    assert parsed_citation.published_in['type'] == 'ta'
+
+
 def parse_citation_and_fields(raw_text):
     raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
-    parsed_citation = parse_citation_fields(parse_citation(raw_citation))
+    parsed_citation = parse_citation_fields(
+        parse_citation(raw_citation)
+    )
     return parsed_citation
-
 
 
 def test_does_not_crash():

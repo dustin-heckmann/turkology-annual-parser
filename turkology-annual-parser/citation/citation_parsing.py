@@ -133,8 +133,8 @@ def parse_location_year_pages(citation: IntermediateCitation) -> IntermediateCit
         r'([.,?]) +\[?'
         r'([^,.?]+)'  # location
         r', *\[?'  # comma, 0+ spaces, maybe opening square bracket
-        r'(\d{4})'  # date_published
-        r'\]?, *'
+        r'(\d{4})'  # date_published (year)
+        r'\]?[,.] *'
         r'(?:'
         r'([\d +DCLIVX]+)'  # number of pages (arabic / roman)
         r' *[Ss]\.|[Ss]\. '  # S. (abbreviation for "Seiten")
