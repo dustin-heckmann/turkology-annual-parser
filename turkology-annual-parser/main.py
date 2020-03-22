@@ -12,6 +12,7 @@ from citation.citation_parsing import find_known_authors, parse_citation
 from citation.field_parsing import parse_citation_fields
 from citation.ids import assign_citation_ids
 from citation.keywords import normalize_keywords_for_citation
+from compression import create_zip_file
 from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
@@ -22,7 +23,7 @@ from repositories.JsonRepository import JsonRepository
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', nargs='*', help='Location of OCR directory', required=True)
-    parser.add_argument('--output', '-o',  help='Location of JSON output file', required=True)
+    parser.add_argument('--output', '-o', help='Location of JSON output file', required=True)
     parser.add_argument('--keyword-file', help='Path to keyword CSV', required=True)
     parser.add_argument('--find-authors', action='store_true')
     parser.add_argument('--resolve-repetitions', action='store_true')
@@ -38,6 +39,7 @@ def main():
     if args.resolve_repetitions:
         citations = resolve_repetitions(citations)
     save_citations(citations, args.output)
+    create_export_bundle(args.output)
 
 
 HARDCODED_AUTHORS = {
@@ -156,6 +158,11 @@ def setup_logging(verbose: bool):
     console.setFormatter(formatter)
     # add the handler to the root logger
     logging.getLogger('').addHandler(console)
+
+
+def create_export_bundle(dump_file_name: str):
+    logging.info('Writing export bundle...')
+    create_zip_file([dump_file_name, dump_file_name+'l'])
 
 
 if __name__ == '__main__':
