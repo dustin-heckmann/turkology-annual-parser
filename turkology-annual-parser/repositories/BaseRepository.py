@@ -13,8 +13,10 @@ class BaseRepository(object):
 
     @classmethod
     def _citation_as_dict(cls, citation: Citation):
-        citation_dict = asdict(replace(citation, type=citation.type.value if citation.type else None),
-                               dict_factory=cls._to_dict)
+        citation_dict = asdict(
+            replace(citation, type=citation.type.value if citation.type else None),
+            dict_factory=cls._to_dict
+        )
         citation_dict['fullyParsed'] = citation.fully_parsed()
         return citation_dict
 
@@ -23,7 +25,8 @@ class BaseRepository(object):
         return dict(
             [
                 (cls.to_camel_case(key), value)
-                for key, value in dict(it).items()
+                for key, value in it
+                if value
             ]
         )
 

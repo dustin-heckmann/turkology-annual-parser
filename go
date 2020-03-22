@@ -6,8 +6,6 @@ VENV_DIR_TA=venv_ta_parser
 PYTHON=$VENV_DIR_TA/bin/python
 PIP=$VENV_DIR_TA/bin/pip
 SOURCE_DIR=turkology-annual-parser
-OCR_FILES=data/ocr/*
-#OCR_FILES=data/ocr/TA01*.xml
 KEYWORDS_FILE=data/keywords.csv
 
 venv() {
@@ -43,9 +41,9 @@ goal_run() {
   venv
   echo "Starting..."
   $PYTHON $SOURCE_DIR/main.py \
-  --input $OCR_FILES \
-  --output ta_citations.json \
-  --keyword-file $KEYWORDS_FILE \
+  --input ta-data/ocr/* \
+  --output ta-data/ta_citations.json \
+  --keyword-file ta-data/keywords.csv \
   --find-authors \
   --resolve-repetitions
 }
@@ -59,9 +57,9 @@ goal_build-docker() {
 ##DOC run-docker: run the application inside a docker container
 goal_run-docker() {
   python $SOURCE_DIR/main.py \
-  --input $OCR_FILES \
+  --input /ta-data/ocr/* \
+  --keyword-file /ta-data/keywords.csv \
   --output /ta-data/ta_citations.json \
-  --keyword-file $KEYWORDS_FILE \
   --find-authors \
   --resolve-repetitions
 }
