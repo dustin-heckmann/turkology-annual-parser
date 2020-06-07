@@ -1,17 +1,18 @@
-import zipfile
 from os import walk, makedirs
-from os.path import join, relpath, basename
+from os.path import join, relpath, dirname, basename
+from typing import List
+
+import zipfile
 from zipfile import ZipFile
 
 ZIP_DIR = '/ta-data'
 ZIP_FILE = 'turkology_annual_export.zip'
-ZIP_PATH = join(ZIP_DIR, ZIP_FILE)
 RESOURCES_DIR = '/ta-data/export'
 
 
-def create_zip_file(dump_file_names):
-    ensure_dir_exists(ZIP_DIR)
-    with ZipFile(ZIP_PATH, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zip_file_handle:
+def create_zip_file(dump_file_names: List[str], output_path: str):
+    ensure_dir_exists(dirname(output_path))
+    with ZipFile(output_path, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zip_file_handle:
         for root, dirs, files in walk(RESOURCES_DIR):
             for file in files:
                 file_name = join(root, file)
