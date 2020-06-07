@@ -12,7 +12,7 @@ class CitationType(Enum):
     CONFERENCE = 'conference'
 
 
-@dataclass
+@dataclass(frozen=True)
 class Person:
     first: Optional[str] = None
     middle: Optional[str] = None
@@ -20,7 +20,7 @@ class Person:
     raw: Optional[str] = None
 
 
-@dataclass
+@dataclass(frozen=True)
 class Citation:
     id: Optional[str] = None
     volume: Optional[int] = None

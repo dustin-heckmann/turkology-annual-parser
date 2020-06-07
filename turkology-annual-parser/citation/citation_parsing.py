@@ -8,22 +8,22 @@ from typing import List, Union, Optional, Iterator, Iterable
 import regex
 
 from domain.citation import Citation, CitationType
-from .field_parsing import parse_name
 from domain.intermediate_citation import IntermediateCitation
+from .field_parsing import parse_name
 
 number_rest_pattern = re.compile(r'(\d+)\.\s*(.+)', re.DOTALL)
 
 
-def parse_citation(raw_citation: IntermediateCitation) -> IntermediateCitation:
-    logging.debug('Parsing citation: {}'.format(raw_citation))
-    citation = replace(raw_citation)
+def parse_citation(citation: IntermediateCitation) -> IntermediateCitation:
+    logging.debug('Parsing citation: {}'.format(citation))
 
     # TODO: Improve
     if not citation.remaining_text:  # Citation has not already been parsed
-        number_text_match = number_rest_pattern.match(raw_citation.raw_text)
+        number_text_match = number_rest_pattern.match(citation.raw_text)
         if not number_text_match:
             raise ValueError(f'Citation does not match basic citation pattern of number & text:\n{str(citation)}')
-        citation.number, citation.remaining_text = number_text_match.groups()
+        number, remaining_text = number_text_match.groups()
+        citation = replace(citation, number=number, remaining_text=remaining_text)
 
     for parse_function in (
             parse_review,
@@ -43,44 +43,49 @@ def parse_citation(raw_citation: IntermediateCitation) -> IntermediateCitation:
 
 
 def parse_review(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
     text = citation.remaining_text
     review_pattern = re.compile(r' +(Rez\.|Abstract +in:) (.*)$')
     review_match = review_pattern.search(text)
     if review_match:
         review_type = review_match.group(1)
         if review_type == 'Rez.':
-            citation.reviews = review_match.group(2)
-            citation.remaining_text = citation.remaining_text[:review_match.span()[0]] + ' {{{ reviews }}}'
+            citation = replace(
+                citation,
+                reviews=review_match.group(2),
+                remaining_text=citation.remaining_text[:review_match.span()[0]] + ' {{{ reviews }}}'
+            )
         elif re.sub(' {2,}', ' ', review_type).lower() == 'abstract in:':
-            citation.abstract_in = review_match.group(2)
-            citation.remaining_text = citation.remaining_text[:review_match.span()[0]] + ' {{{ abstract_in }}}'
+            citation = replace(
+                citation,
+                abstract_in=review_match.group(2),
+                remaining_text=citation.remaining_text[:review_match.span()[0]] + ' {{{ abstract_in }}}'
+            )
     return citation
 
 
 def parse_comment(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
     text = citation.remaining_text
     comment_pattern = re.compile(r'\[([^\]]+)\]\.?( {{{ reviews }}})?$')
     ta_references_pattern = re.compile(r's\. (?:TA \d+(?:-\d+)?\.\d+)(?:, \d(?:-\d+)?\.\d+)*')
     comment_match = comment_pattern.search(text)
-    if comment_match:
-        comment = comment_match.group(1).strip().rstrip('.')
-        ta_references_match = ta_references_pattern.fullmatch(comment)
-        if ta_references_match:
-            comment_field_name = 'ta_references'
-            citation.ta_references = comment
-        else:
-            comment_field_name = 'comment'
-            citation.comment = comment
-        text = text[:comment_match.span()[0]] + ' {{{ %s }}}' % comment_field_name
-        if comment_match.group(2):
-            text += comment_match.group(2)
+    if not comment_match:
+        return citation
+
+    comment = comment_match.group(1).strip().rstrip('.')
+    ta_references_match = ta_references_pattern.fullmatch(comment)
+    if ta_references_match:
+        comment_field_name = 'ta_references'
+        citation = replace(citation, ta_references=comment)
+    else:
+        comment_field_name = 'comment'
+        citation = replace(citation, comment=comment)
+    text = text[:comment_match.span()[0]] + ' {{{ %s }}}' % comment_field_name
+    if comment_match.group(2):
+        text += comment_match.group(2)
     return replace(citation, remaining_text=text)
 
 
 def parse_location_and_date(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
     text = citation.remaining_text
     loc_date_pattern = re.compile(
         r'^([^,]+), *((?:\d{1,2}\. *(?:(?:[IVX]{1,4})\. *)?(?:\d{4})?[-—])?\d{1,2}\. *[IVX]{1,4}\. *\d{4})'
@@ -90,25 +95,34 @@ def parse_location_and_date(citation: IntermediateCitation) -> IntermediateCitat
     )
     match = loc_date_pattern.search(text)
     if match:
-        citation.location = match.group(1)
-        citation.date = match.group(2)
-        citation.type = CitationType.CONFERENCE
+        citation = replace(
+            citation,
+            location=match.group(1),
+            date=match.group(2),
+            type=CitationType.CONFERENCE,
+        )
         text = '{{{ location }}} {{{ date }}} ' + text[match.span()[1]:]
+
     match = volumes_loc_year_pattern.search(text)
     if match:
-        citation.number_of_volumes = match.group(1)
-        citation.location = match.group(2)
-        citation.date_published = match.group(3)
+        citation = replace(
+            citation,
+            number_of_volumes=match.group(1),
+            location=match.group(2),
+            date_published=match.group(3),
+        )
+
         if match.group(4):
-            citation.number_of_pages = match.group(4).strip()
-        text = text[:match.span()[0]] \
-               + ' {{{ number_of_volumes }}} {{{ location }}} {{{ date_published }}} ' \
-               + text[match.span()[1]:]
+            citation = replace(citation, number_of_pages=match.group(4).strip())
+        text = ''.join((
+            text[:match.span()[0]],
+            ' {{{ number_of_volumes }}} {{{ location }}} {{{ date_published }}} ',
+            text[match.span()[1]:],
+        ))
     return replace(citation, remaining_text=text)
 
 
 def parse_materials(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
     text = citation.remaining_text
     material_pattern = re.compile(
         r', (\[?\d+\]? *(?:(?:Karte|Tafel|Tabelle|Falt(?:tafel|karte|tabelle))n?|Porträts?|Abb\.|Tab\.|(?:Falt|Schlacht)pl(?:an|äne)))(\.)?'
@@ -130,7 +144,6 @@ def parse_materials(citation: IntermediateCitation) -> IntermediateCitation:
 
 
 def parse_location_year_pages(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
     text = citation.remaining_text
     loc_year_pages_pattern = re.compile(
         r'([.,?]) +\[?'
@@ -147,21 +160,24 @@ def parse_location_year_pages(citation: IntermediateCitation) -> IntermediateCit
     )
     loc_year_pages_match = loc_year_pages_pattern.search(text)
     if loc_year_pages_match:
-        # Location
-        citation.location = loc_year_pages_match.group(2).strip()
-
-        # datePublished
-        citation.date_published = loc_year_pages_match.group(3)
+        citation = replace(
+            citation,
+            location=loc_year_pages_match.group(2).strip(),
+            date_published=loc_year_pages_match.group(3),
+        )
 
         if loc_year_pages_match.group(4):
             # numberOfPages
-            citation.number_of_pages = loc_year_pages_match.group(4).strip()
+            citation = replace(
+                citation,
+                number_of_pages=loc_year_pages_match.group(4).strip()
+            )
         else:
-            # pageStart
-            citation.page_start = loc_year_pages_match.group(5)
-
-            # pageEnd
-            citation.page_end = loc_year_pages_match.group(6)
+            citation = replace(
+                citation,
+                page_start=loc_year_pages_match.group(5),
+                page_end=loc_year_pages_match.group(6),
+            )
 
         text = ''.join((
             text[:loc_year_pages_match.span()[0]],
@@ -173,53 +189,60 @@ def parse_location_year_pages(citation: IntermediateCitation) -> IntermediateCit
 
 
 def parse_series(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
-    text = citation.remaining_text
     series_pattern = re.compile(
         r'{{{ (?:number_of_pages|material|date_published) }}}([ .,]*\(([^)]+)\))\. *?(?:$|{{{ comment)'
     )
-    series_match = series_pattern.search(text)
+    series_match = series_pattern.search(citation.remaining_text)
     if series_match:
-        citation.series = series_match.group(2).strip()
-        text = text[:series_match.span(1)[0]] + '{{{ series }}}' + text[series_match.span(1)[1]:]
-    return replace(citation, remaining_text=text)
+        remaining_text = citation.remaining_text[:series_match.span(1)[0]] \
+                         + '{{{ series }}}' \
+                         + citation.remaining_text[series_match.span(1)[1]:]
+        return replace(
+            citation,
+            series=series_match.group(2).strip(),
+            remaining_text=remaining_text,
+        )
+    return citation
 
 
 def parse_published_in(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
-    text = citation.remaining_text
     in_pattern = re.compile(r' +In ?: +([^.]+ *[\d.\-— ();,*S/=und]+)(?:[.,]|({{{))')
-    in_match = in_pattern.search(text)
+    in_match = in_pattern.search(citation.remaining_text)
     if in_match:
-        citation.published_in = in_match.group(1)
-        citation.type = CitationType.ARTICLE
-        text = text[:in_match.span()[0]] + ' {{{ in }}}'
+        text = citation.remaining_text[:in_match.span()[0]] + ' {{{ in }}}'
         if in_match.group(2):
             text += text[in_match.span(2)[1]:]
         else:
             text += text[in_match.span()[1]:]
-    return replace(citation, remaining_text=text)
+        return replace(
+            citation,
+            published_in=in_match.group(1),
+            type=CitationType.ARTICLE,
+            remaining_text=text,
+        )
+    return citation
 
 
 def parse_in_missing(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
     text = citation.remaining_text
     in_missing_pattern = re.compile(r' +([A-Z]+ +(?:\d+(?:-\d+)?)\.(?:\d+(?:-\d+)?\.){2,})(?:[., ]|({{{))')
     in_missing_match = in_missing_pattern.search(text)
     if in_missing_match:
-        citation.published_in = in_missing_match.group(1)
-        citation.type = CitationType.ARTICLE
         text = text[:in_missing_match.span()[0]] + ' {{{ in }}}'
         if in_missing_match.group(2):
             text += text[in_missing_match.span(2)[1]:]
         else:
             text += text[in_missing_match.span()[1]:]
-    return replace(citation, remaining_text=text)
+        return replace(
+            citation,
+            published_in=in_missing_match.group(1),
+            type=CitationType.ARTICLE,
+            remaining_text=text,
+        )
+    return citation
 
 
 def parse_title(citation: Union[Citation, IntermediateCitation]) -> Union[Citation, IntermediateCitation]:
-    citation = replace(citation)
-    text = citation.remaining_text
     title_patterns = [
         re.compile(r'{{{ authors }}}\s*(.+?)\s*{{{ (?:in|editors|translators|number_of_volumes|location) }}}'),
         re.compile(r'{{{ authors }}}\s*([^.(]+?)[.,]?\s*{{{'),
@@ -228,12 +251,17 @@ def parse_title(citation: Union[Citation, IntermediateCitation]) -> Union[Citati
         ),
     ]
     for title_pattern in title_patterns:
-        title_match = title_pattern.search(text)
+        title_match = title_pattern.search(citation.remaining_text)
         if title_match:
-            citation.title = title_match.group(1).strip().rstrip('.,')
-            text = text[:title_match.span(1)[0]] + '{{{ title }}}' + text[title_match.span(1)[1]:]
-            break
-    return replace(citation, remaining_text=text)
+            text = citation.remaining_text[:title_match.span(1)[0]] \
+                   + '{{{ title }}}' \
+                   + citation.remaining_text[title_match.span(1)[1]:]
+            return replace(
+                citation,
+                title=title_match.group(1).strip().rstrip('.,'),
+                remaining_text=text,
+            )
+    return citation
 
 
 given_names_pattern = r'(?:\w{1,2}\.(?:-\w{1,2}\.)?|[\w-]+)(?: (?:\w{1,2}\.(?:-\w{1,2}\.)?|[\w-]+)){,3}(?! +\w\.)'
@@ -246,31 +274,34 @@ multiple_authors_pattern = re.compile(
 
 
 def parse_authors(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
     text = citation.remaining_text
     author_pattern = re.compile(f'^({last_name_given_names_pattern}) {{2}} +', re.UNICODE)
     author_pattern_volume_1 = re.compile(r'^(%s\.):?(?<!geb\.) (?!{{{)+' % last_name_given_names_pattern, re.UNICODE)
     multiple_authors_match = multiple_authors_pattern.search(text)
     if multiple_authors_match:
         # multiple_authors_match = multiple_authors_pattern.search(text) # Probably pointless
-        citation.authors = multiple_authors_match.group()
-        text = ' '.join((
-            '{{{ authors }}}',
-            text[multiple_authors_match.span()[1]:].strip()
-        ))
+        return replace(
+            citation,
+            authors=multiple_authors_match.group(),
+            remaining_text=' '.join((
+                '{{{ authors }}}',
+                text[multiple_authors_match.span()[1]:].strip()
+            ))
+        )
     if citation.volume == '1':
         author_match = author_pattern_volume_1.search(text)
     else:
         author_match = author_pattern.search(text)
     if author_match:
-        citation.authors = author_match.group(1).strip()
-        text = '{{{ authors }}} ' + text[author_match.span()[1]:].strip()
-    return replace(citation, remaining_text=text)
+        return replace(
+            citation,
+            authors=author_match.group(1).strip(),
+            remaining_text='{{{ authors }}} ' + text[author_match.span()[1]:].strip(),
+        )
+    return citation
 
 
 def parse_editors_translators(citation: IntermediateCitation) -> IntermediateCitation:
-    citation = replace(citation)
-    text = citation.remaining_text
     role_person_pattern = re.compile(
         r'\. *({given_last}) (ed|trs)\.'.format(given_last=given_names_last_name_pattern)
     )
@@ -279,29 +310,34 @@ def parse_editors_translators(citation: IntermediateCitation) -> IntermediateCit
             given_last=given_names_last_name_pattern)
     )
 
-    multiple_role_persons_match = role_persons_pattern.search(text)
+    multiple_role_persons_match = role_persons_pattern.search(citation.remaining_text)
     if multiple_role_persons_match:
         role_name = {'ed': 'editors', 'trs': 'translators'}[multiple_role_persons_match.group(3)]
-        setattr(
+        return replace(
             citation,
-            role_name,
-            multiple_role_persons_match.group(1).strip()
+            remaining_text=''.join((
+                citation.remaining_text[:multiple_role_persons_match.span(1)[0]],
+                (' {{{ %s }}} ' % role_name),
+                citation.remaining_text[multiple_role_persons_match.span()[1]:],
+            )),
+            type=CitationType.COLLECTION if role_name == 'editors' else None,
+            **{role_name: multiple_role_persons_match.group(1).strip()},
         )
-        text = text[:multiple_role_persons_match.span(1)[0]] \
-               + (' {{{ %s }}} ' % role_name) \
-               + text[multiple_role_persons_match.span()[1]:]
-    role_person_match = role_person_pattern.search(text)
+
+    role_person_match = role_person_pattern.search(citation.remaining_text)
     if role_person_match:
         role_name = {'ed': 'editors', 'trs': 'translators'}[role_person_match.group(2)]
-        setattr(citation, role_name, role_person_match.group(1))
-        text = ''.join((
-            text[:role_person_match.span(1)[0]],
-            (' {{{ %s }}} ' % role_name),
-            text[role_person_match.span()[1]:],
-        ))
-    if citation.editors:
-        citation.type = CitationType.COLLECTION
-    return replace(citation, remaining_text=text)
+        return replace(
+            citation,
+            remaining_text=''.join((
+                citation.remaining_text[:role_person_match.span(1)[0]],
+                (' {{{ %s }}} ' % role_name),
+                citation.remaining_text[role_person_match.span()[1]:],
+            )),
+            type=CitationType.COLLECTION if role_name == 'editors' else None,
+            **{role_name: role_person_match.group(1)},
+        )
+    return citation
 
 
 def find_multiple_authors(citation: Citation, known_authors_pattern) -> Optional[Citation]:
@@ -315,9 +351,11 @@ def find_multiple_authors(citation: Citation, known_authors_pattern) -> Optional
     authors_match = authors_match[0]
     author_names = [name for name in authors_match[:-1] if name]
     remaining_text = '{{{ authors }}} ' + authors_match[-1]
-    citation.remaining_text = remaining_text
-    citation.authors = [parse_name(name) for name in author_names]
-    return citation
+    return replace(
+        citation,
+        remaining_text=remaining_text,
+        authors=[parse_name(name) for name in author_names]
+    )
 
 
 def find_known_authors(citations: List[Citation], known_authors: Iterable[str]) -> Iterator[Citation]:
@@ -339,7 +377,6 @@ def reparse_citation(citation: Citation) -> Citation:
 
 
 def find_authors(citation: Citation, known_authors_pattern) -> Optional[Citation]:
-    citation = replace(citation)
     authors_pattern = regex.compile(
         r'^({}){{e<=1}}\.?\s+(\p{{Lu}}[^ .]+ )'.format(known_authors_pattern),
         regex.UNICODE | regex.IGNORECASE
@@ -350,6 +387,8 @@ def find_authors(citation: Citation, known_authors_pattern) -> Optional[Citation
         return None
     author_name = author_match.group(1)
     remaining_text = '{{{ authors }}} ' + citation.remaining_text[author_match.span(2)[0]:]
-    citation.remaining_text = remaining_text
-    citation.authors = [parse_name(author_name)]
-    return citation
+    return replace(
+        citation,
+        remaining_text=remaining_text,
+        authors=[parse_name(author_name)]
+    )

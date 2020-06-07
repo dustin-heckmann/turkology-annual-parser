@@ -1,3 +1,4 @@
+from dataclasses import replace
 from typing import Dict, List
 
 import regex as re
@@ -32,7 +33,7 @@ def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[st
     keyword_pattern_fuzzy = re.compile(keyword_pattern_base + '{e<=2}', re.IGNORECASE)
     citation_pattern = re.compile(r'(\d+)\.\.?\s+.+', re.DOTALL)
     broken_bullet_pattern = re.compile(r'^[φ#0Φ].*')  # , s\.( a\.)? \d+')
-    page_number_pattern = re.compile('(\d+\s+Turkologischer Anzeiger|Turkologischer Anzeiger\s+\d+){e<=2}')
+    page_number_pattern = re.compile(r'(\d+\s+Turkologischer Anzeiger|Turkologischer Anzeiger\s+\d+){e<=2}')
 
     citation_section_has_begun = False
     latest_citation_number = 0
@@ -90,8 +91,7 @@ def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[st
             elif citation_section_has_begun and citation_match:
                 paragraph_type = ParagraphType.CITATION
                 latest_citation_number = int(citation_match.group(1))
-        paragraph.type = paragraph_type
-        yield paragraph
+        yield replace(paragraph, type=paragraph_type)
         if not page_number_pattern.fullmatch(text):
             previous_type = paragraph_type
 

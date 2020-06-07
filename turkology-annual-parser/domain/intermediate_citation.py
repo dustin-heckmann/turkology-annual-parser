@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from domain.citation import CitationType
 
 
-@dataclass
+@dataclass(frozen=True)
 class IntermediateCitation:
     volume: Optional[int] = None
     number: Optional[str] = None
@@ -27,7 +27,7 @@ class IntermediateCitation:
     amendments: List[str] = field(default_factory=list)
     date_published: Optional[str] = None
     type: Optional[CitationType] = None
-    ta_references: List[str] = field(default_factory=list)
+    ta_references: Optional[str] = None
     page_range: Optional[str] = None
     series: Optional[str] = None
     remaining_text: str = ''

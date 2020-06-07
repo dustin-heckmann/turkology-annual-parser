@@ -86,8 +86,9 @@ def parse_name(name):
     )
 
 
-def parse_ta_references(reference_string):
-    if not reference_string: return []
+def parse_ta_references(reference_string: str):
+    if not reference_string:
+        return []
     reference_string = re.sub(r'^s\. TA ', '', reference_string)
     reference_strings = re.split(', ', reference_string)
     references = []

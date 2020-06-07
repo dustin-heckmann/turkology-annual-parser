@@ -4,21 +4,20 @@ import logging
 import multiprocessing
 import os
 from multiprocessing.queues import Queue
-from queue import Queue as QueueType
 from typing import Dict, List, Set
 
-from .citation.assembly import assemble_citations
+from citation.assembly import assemble_citations
+from citation.citation_parsing import find_known_authors, parse_citation
+from citation.field_parsing import parse_citation_fields
+from citation.ids import assign_citation_ids
+from citation.keywords import normalize_keywords_for_citation
+from compression import create_zip_file
 from domain.citation import Citation
-from .citation.citation_parsing import find_known_authors, parse_citation
-from .citation.field_parsing import parse_citation_fields
-from .citation.ids import assign_citation_ids
-from .citation.keywords import normalize_keywords_for_citation
-from .compression import create_zip_file
-from .paragraph.paragraph_correction import correct_paragraphs
-from .paragraph.paragraph_extraction import extract_paragraphs
-from .paragraph.type_detection import detect_paragraph_types
-from .repetitions import add_repeated_info
-from .repositories.JsonRepository import JsonRepository
+from paragraph.paragraph_correction import correct_paragraphs
+from paragraph.paragraph_extraction import extract_paragraphs
+from paragraph.type_detection import detect_paragraph_types
+from repetitions import add_repeated_info
+from repositories.JsonRepository import JsonRepository
 
 
 def main():
@@ -96,10 +95,13 @@ def run_full_pipeline(
 ) -> List[Citation]:
     keyword_mapping = get_keyword_mapping(keyword_file)
     m = multiprocessing.Manager()
-    queue: QueueType = m.Queue()
+    queue = m.Queue()
     with multiprocessing.Pool() as pool:
-        pool.starmap(run_full_pipeline_on_volume,
-                     [(volume_filename, keyword_mapping, queue) for volume_filename in ocr_files])
+        args = ((volume_filename, keyword_mapping, queue) for volume_filename in ocr_files)
+        pool.starmap(
+            run_full_pipeline_on_volume,
+            args
+        )
     pool.join()
     citations = []
     while not queue.empty():
@@ -111,7 +113,7 @@ def run_full_pipeline(
 def run_full_pipeline_on_volume(
         volume_filename: str,
         keyword_mapping: Dict[str, Dict[str, str]],
-        queue: Queue[Citation]
+        queue: Queue
 ) -> None:
     logging.info("START: %s", volume_filename)
 

@@ -12,7 +12,7 @@ class ParagraphType(Enum):
     JOURNAL_SECTION_BEGIN = 'journal-section-begin'
 
 
-@dataclass
+@dataclass(frozen=True)
 class Paragraph:
     text: str
     volume: Optional[int] = None
