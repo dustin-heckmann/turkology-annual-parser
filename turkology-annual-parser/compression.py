@@ -21,5 +21,5 @@ def create_zip_file(dump_file_names: List[str], output_path: str):
             zip_file_handle.write(dump_file_name, basename(dump_file_name))
 
 
-def ensure_dir_exists(dir):
-    makedirs(dir, exist_ok=True)
+def ensure_dir_exists(path: str):
+    makedirs(path, exist_ok=True)

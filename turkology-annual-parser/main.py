@@ -81,7 +81,7 @@ def resolve_repetitions(citations: List[Citation]):
     return add_repeated_info(citations)
 
 
-def save_citations(citations: List[Citation], output_filename: str):
+def save_citations(citations: List[Citation], output_filename: str) -> None:
     os.makedirs(os.path.dirname(os.path.abspath(output_filename)), exist_ok=True)
     repository = JsonRepository(output_filename)
     logging.info('Writing JSON file...')
@@ -91,7 +91,7 @@ def save_citations(citations: List[Citation], output_filename: str):
 def run_full_pipeline(
         ocr_files: List[str],
         keyword_file: str
-):
+) -> None:
     keyword_mapping = get_keyword_mapping(keyword_file)
     m = multiprocessing.Manager()
     queue = m.Queue()
@@ -110,7 +110,7 @@ def run_full_pipeline_on_volume(
         volume_filename: str,
         keyword_mapping: Dict[str, Dict[str, str]],
         queue: Queue
-):
+) -> None:
     logging.info("START: %s", volume_filename)
 
     logging.debug('Extracting paragraphs...')
