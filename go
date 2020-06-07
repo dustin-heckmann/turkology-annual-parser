@@ -52,7 +52,7 @@ goal_build-docker() {
 
 ##DOC run-docker: run the application inside a docker container
 goal_run-docker() {
-  pipenv python $SOURCE_DIR/main.py \
+  pipenv run python $SOURCE_DIR/main.py \
   --input /ta-data/ocr/* \
   --keyword-file /ta-data/keywords.csv \
   --output /ta-data/ta_citations.json \
