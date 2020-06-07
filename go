@@ -41,11 +41,12 @@ goal_run() {
   venv
   echo "Starting..."
   $PYTHON $SOURCE_DIR/main.py \
-  --input ta-data/ocr/* \
-  --output ta-data/ta_citations.json \
-  --keyword-file ta-data/keywords.csv \
   --find-authors \
-  --resolve-repetitions
+  --resolve-repetitions \
+  --input ta-data/ocr/* \
+  --keyword-file ta-data/keywords.csv \
+  --output ta-data/ta_citations.json \
+  --zip-output ta-data/turkology_annual_export.zip
 }
 
 ##DOC build-docker: build the application inside a docker container

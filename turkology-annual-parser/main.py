@@ -24,6 +24,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', nargs='*', help='Location of OCR directory', required=True)
     parser.add_argument('--output', '-o', help='Location of JSON output file', required=True)
+    parser.add_argument('--zip-output', '-z', help='Location of compressed export bundle', required=True)
     parser.add_argument('--keyword-file', help='Path to keyword CSV', required=True)
     parser.add_argument('--find-authors', action='store_true')
     parser.add_argument('--resolve-repetitions', action='store_true')
@@ -39,7 +40,7 @@ def main():
     if args.resolve_repetitions:
         citations = resolve_repetitions(citations)
     save_citations(citations, args.output)
-    create_export_bundle(args.output)
+    create_export_bundle(args.output, args.zip_output)
 
 
 HARDCODED_AUTHORS = {
@@ -57,7 +58,6 @@ HARDCODED_AUTHORS = {
     'Uçankuş, Hasan T',
     'Landau, Jacob M',
     'Özeğe, Seyfettin',
-
 }
 
 
@@ -160,9 +160,9 @@ def setup_logging(verbose: bool):
     logging.getLogger('').addHandler(console)
 
 
-def create_export_bundle(dump_file_name: str):
+def create_export_bundle(dump_file_name: str, zip_path: str):
     logging.info('Writing export bundle...')
-    create_zip_file([dump_file_name, dump_file_name+'l'])
+    create_zip_file([dump_file_name, dump_file_name+'l'], zip_path)
 
 
 if __name__ == '__main__':
