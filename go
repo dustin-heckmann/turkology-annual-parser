@@ -46,12 +46,13 @@ goal_run() {
 ##DOC build-docker: build the application inside a docker container
 goal_build-docker() {
   pip install --upgrade pip
-  pip install -r requirements.txt
+  pip install pipenv
+  pipenv install
 }
 
 ##DOC run-docker: run the application inside a docker container
 goal_run-docker() {
-  python $SOURCE_DIR/main.py \
+  pipenv python $SOURCE_DIR/main.py \
   --input /ta-data/ocr/* \
   --keyword-file /ta-data/keywords.csv \
   --output /ta-data/ta_citations.json \
