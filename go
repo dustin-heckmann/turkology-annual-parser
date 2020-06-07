@@ -11,6 +11,11 @@ goal_test() {
   pipenv run pytest
 }
 
+##DOC typecheck: run typecheck (using mypy)
+goal_typecheck() {
+  pipenv run mypy -p "$SOURCE_DIR"
+}
+
 ##DOC build: build the application
 goal_build() {
   pipenv install
