@@ -13,3 +13,6 @@ nameparser = "*"
 lxml = "*"
 regex = "*"
 jsonlines = "*"
+
+[requires]
+python_version = "3.8"
