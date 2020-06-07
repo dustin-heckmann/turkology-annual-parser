@@ -1,12 +1,12 @@
 from unittest.mock import patch
 
-from paragraph.paragraph import Paragraph
-from paragraph.paragraph_extraction import volume_from_filename, extract_paragraphs
+from domain.paragraph import Paragraph
+from ..paragraph_extraction import volume_from_filename, extract_paragraphs
 
 
 @patch('paragraph.paragraph_extraction.WMLParser')
 def test_extract_paragraphs(WMLParser):
-    WMLParser.return_value = iter([Paragraph(text='some text'), Paragraph(text='some more')])
+    WMLParser.return_value = iter([Paragraph(text='some text', volume=1), Paragraph(text='some more', volume=1)])
     paragraphs = list(extract_paragraphs('TA99_01.xml'))
     assert paragraphs == [
         Paragraph(text='some text', volume=99),

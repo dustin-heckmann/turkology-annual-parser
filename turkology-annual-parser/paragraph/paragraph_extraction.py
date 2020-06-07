@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from dataclasses import replace
 
-from paragraph.wmlparser import WMLParser
+from .wmlparser import WMLParser
 
 
 def extract_paragraphs(volume_filename):

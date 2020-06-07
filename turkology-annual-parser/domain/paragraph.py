@@ -14,7 +14,7 @@ class ParagraphType(Enum):
 
 @dataclass
 class Paragraph:
-    volume: int = None
-    text: str = None
-    originalIndex: int = None
+    text: str
+    volume: Optional[int] = None
+    originalIndex: Optional[int] = None
     type: Optional[ParagraphType] = None

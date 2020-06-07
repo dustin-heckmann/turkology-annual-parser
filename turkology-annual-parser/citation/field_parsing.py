@@ -3,8 +3,8 @@ from datetime import date
 
 import nameparser
 
-from citation.citation import Citation, Person
-from citation.intermediate_citation import IntermediateCitation
+from domain.citation import Citation, Person
+from domain.intermediate_citation import IntermediateCitation
 
 
 def parse_citation_fields(intermediate: IntermediateCitation) -> Citation:

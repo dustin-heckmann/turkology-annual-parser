@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 from dataclasses import asdict, replace
 
-from citation.citation import Citation
+from domain.citation import Citation
 
 
 class BaseRepository(object):

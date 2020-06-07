@@ -2,7 +2,7 @@ from typing import Dict, List
 
 import regex as re
 
-from paragraph.paragraph import Paragraph, ParagraphType
+from domain.paragraph import Paragraph, ParagraphType
 
 MAX_CITATION_GAP = 500
 
@@ -42,7 +42,7 @@ def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[st
 
     for paragraph in paragraphs:
         paragraph_type = None
-        text = paragraph.text
+        text = paragraph.text or ''
         is_possible_amendment = previous_type == ParagraphType.CITATION or (
                 previous_type and previous_type == ParagraphType.AMENDMENT)
         citation_match = citation_pattern.fullmatch(text)

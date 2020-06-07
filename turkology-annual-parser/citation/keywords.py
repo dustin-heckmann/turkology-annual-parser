@@ -3,7 +3,7 @@ from dataclasses import replace
 from operator import itemgetter
 from typing import Dict
 
-from citation.citation import Citation
+from domain.citation import Citation
 
 raw_keyword_pattern = re.compile(r'(?P<code>[A-Za-z]+)(?:\..+)?')
 

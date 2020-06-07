@@ -1,5 +1,5 @@
-from paragraph.paragraph import Paragraph, ParagraphType
-from paragraph.type_detection import detect_paragraph_types
+from domain.paragraph import Paragraph, ParagraphType
+from ..type_detection import detect_paragraph_types
 
 KEYWORD_MAPPING = {
     'A': {'de': 'Allgemeines'},

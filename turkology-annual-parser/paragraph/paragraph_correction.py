@@ -4,7 +4,7 @@ from dataclasses import replace
 from operator import attrgetter
 from typing import List
 
-from paragraph.paragraph import Paragraph
+from domain.paragraph import Paragraph
 
 
 def replace_text(search_pattern, replacement, paragraph: Paragraph):
@@ -13,7 +13,7 @@ def replace_text(search_pattern, replacement, paragraph: Paragraph):
 
 def split_paragraph_before(paragraph: Paragraph, split_str):
     text = paragraph.text
-    paragraph.text = None
+    paragraph.text = ''
     split_index = text.index(split_str)
     if split_index == -1:
         return [paragraph]

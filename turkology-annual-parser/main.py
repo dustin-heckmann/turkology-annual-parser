@@ -4,20 +4,21 @@ import logging
 import multiprocessing
 import os
 from multiprocessing.queues import Queue
+from queue import Queue as QueueType
 from typing import Dict, List, Set
 
-from citation.assembly import assemble_citations
-from citation.citation import Citation
-from citation.citation_parsing import find_known_authors, parse_citation
-from citation.field_parsing import parse_citation_fields
-from citation.ids import assign_citation_ids
-from citation.keywords import normalize_keywords_for_citation
-from compression import create_zip_file
-from paragraph.paragraph_correction import correct_paragraphs
-from paragraph.paragraph_extraction import extract_paragraphs
-from paragraph.type_detection import detect_paragraph_types
-from repetitions import add_repeated_info
-from repositories.JsonRepository import JsonRepository
+from .citation.assembly import assemble_citations
+from domain.citation import Citation
+from .citation.citation_parsing import find_known_authors, parse_citation
+from .citation.field_parsing import parse_citation_fields
+from .citation.ids import assign_citation_ids
+from .citation.keywords import normalize_keywords_for_citation
+from .compression import create_zip_file
+from .paragraph.paragraph_correction import correct_paragraphs
+from .paragraph.paragraph_extraction import extract_paragraphs
+from .paragraph.type_detection import detect_paragraph_types
+from .repetitions import add_repeated_info
+from .repositories.JsonRepository import JsonRepository
 
 
 def main():
@@ -72,7 +73,8 @@ def get_known_authors_from_citations(citations: List[Citation]) -> Set[str]:
     known_authors = set()
     for citation in citations:
         for author in citation.authors:
-            known_authors.add(author.raw)
+            if author.raw:
+                known_authors.add(author.raw)
     return known_authors
 
 
@@ -91,10 +93,10 @@ def save_citations(citations: List[Citation], output_filename: str) -> None:
 def run_full_pipeline(
         ocr_files: List[str],
         keyword_file: str
-) -> None:
+) -> List[Citation]:
     keyword_mapping = get_keyword_mapping(keyword_file)
     m = multiprocessing.Manager()
-    queue = m.Queue()
+    queue: QueueType = m.Queue()
     with multiprocessing.Pool() as pool:
         pool.starmap(run_full_pipeline_on_volume,
                      [(volume_filename, keyword_mapping, queue) for volume_filename in ocr_files])
@@ -109,7 +111,7 @@ def run_full_pipeline(
 def run_full_pipeline_on_volume(
         volume_filename: str,
         keyword_mapping: Dict[str, Dict[str, str]],
-        queue: Queue
+        queue: Queue[Citation]
 ) -> None:
     logging.info("START: %s", volume_filename)
 
@@ -126,8 +128,8 @@ def run_full_pipeline_on_volume(
     raw_citations = assemble_citations(typed_paragraphs)
 
     logging.debug('Parsing citations...')
-    citations = (parse_citation(citation) for citation in raw_citations)
-    citations = (parse_citation_fields(citation) for citation in citations)
+    intermediate_citations = (parse_citation(citation) for citation in raw_citations)
+    citations = (parse_citation_fields(citation) for citation in intermediate_citations)
     citations = assign_citation_ids(citations)
     citations = (normalize_keywords_for_citation(citation, keyword_mapping) for citation in citations)
     for citation in citations:
@@ -162,7 +164,7 @@ def setup_logging(verbose: bool):
 
 def create_export_bundle(dump_file_name: str, zip_path: str):
     logging.info('Writing export bundle...')
-    create_zip_file([dump_file_name, dump_file_name+'l'], zip_path)
+    create_zip_file([dump_file_name, dump_file_name + 'l'], zip_path)
 
 
 if __name__ == '__main__':

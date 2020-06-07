@@ -1,7 +1,7 @@
-from citation.citation import CitationType, Citation, Person
-from citation.citation_parsing import parse_citation, find_known_authors
-from citation.field_parsing import parse_citation_fields
-from citation.intermediate_citation import IntermediateCitation
+from domain.citation import CitationType, Citation, Person
+from ..citation_parsing import parse_citation, find_known_authors
+from ..field_parsing import parse_citation_fields
+from domain.intermediate_citation import IntermediateCitation
 
 
 def test_parse_citation():
@@ -43,7 +43,13 @@ def test_parse_collection():
 
 
 def test_find_known_authors():
-    raw_text = '12. Handžić, Adem Problematika sakupljanja i izdavanja turskih istorij-skih izvora u radu Orijentalnog Instituta. In: POF 20-21.1970/71 (1974).213-221. [Die Problematik der Erfassung und Herausgabe der türkischen historischen Quellen im Rahmen der Arbeiten des Orientalischen Instituts in Sarajevo, Jugoslavien.]'
+    raw_text = ''.join((
+        '12. Handžić, Adem ',
+        'Problematika sakupljanja i izdavanja turskih istorij-skih izvora u radu Orijentalnog Instituta. ',
+        'In: POF 20-21.1970/71 (1974).213-221. ',
+        '[Die Problematik der Erfassung und Herausgabe der türkischen historischen Quellen ',
+        'im Rahmen der Arbeiten des Orientalischen Instituts in Sarajevo, Jugoslavien.]',
+    ))
     raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
     parsed_citation = parse_citation_fields(parse_citation(raw_citation))
     [parsed_citation] = find_known_authors([parsed_citation], ['Handžić, Adem'])
@@ -67,13 +73,15 @@ def test_find_known_authors():
 
 
 def test_find_title_before_field_marker():
-    raw_text = '1667. ArsenijeviĆ, Lazar-Batalaka     Istorija srpskog ustanka. Vladimir stojancević ed. Beograd, 1979, 1 S.'
+    raw_text = '1667. ArsenijeviĆ, Lazar-Batalaka     ' \
+               'Istorija srpskog ustanka. Vladimir stojancević ed. Beograd, 1979, 1 S.'
     parsed_citation = parse_citation_and_fields(raw_text)
     assert parsed_citation.title == 'Istorija srpskog ustanka'
 
 
 def test_13_1584():
-    raw_text = '1584. Mehrländer, Ursula     Türkische Jugendliche - keine beruflichen Chancen in Deutschland? Bonn, 1983, 228S.'
+    raw_text = '1584. Mehrländer, Ursula     ' \
+               'Türkische Jugendliche - keine beruflichen Chancen in Deutschland? Bonn, 1983, 228S.'
     parsed_citation = parse_citation_and_fields(raw_text)
     assert parsed_citation.location == 'Bonn'
     assert parsed_citation.date_published == {'year': 1983}

@@ -1,12 +1,12 @@
 from collections import defaultdict, Counter
 from dataclasses import replace
-from typing import Iterator
+from typing import Iterator, DefaultDict
 
-from citation.citation import Citation
+from domain.citation import Citation
 
 
 def assign_citation_ids(citations: Iterator[Citation]):
-    volume_numbers = defaultdict(Counter)
+    volume_numbers: DefaultDict[int, Counter] = defaultdict(Counter)
 
     for citation in citations:
         citation_id = f'{citation.volume}-{citation.number}'

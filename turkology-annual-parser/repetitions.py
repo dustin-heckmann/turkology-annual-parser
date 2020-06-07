@@ -1,7 +1,7 @@
 from collections import defaultdict
 from typing import List
 
-from citation.citation import Citation, CitationType
+from domain.citation import Citation, CitationType
 
 
 def add_repeated_info(citations: List[Citation]):

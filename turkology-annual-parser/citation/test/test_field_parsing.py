@@ -1,6 +1,6 @@
-from citation.citation import Citation, Person, CitationType
-from citation.field_parsing import parse_citation_fields
-from citation.intermediate_citation import IntermediateCitation
+from domain.citation import Citation, Person, CitationType
+from ..field_parsing import parse_citation_fields
+from domain.intermediate_citation import IntermediateCitation
 
 CITATION = IntermediateCitation(
     remaining_text='{{{ title }}}.  {{{ editors }}}   {{{ number_of_volumes }}} '

@@ -3,7 +3,7 @@ from typing import List, Optional
 
 from dataclasses import dataclass, field
 
-from citation.citation import CitationType
+from domain.citation import CitationType
 
 
 @dataclass
@@ -26,14 +26,14 @@ class IntermediateCitation:
     material: List[str] = field(default_factory=list)
     amendments: List[str] = field(default_factory=list)
     date_published: Optional[str] = None
-    type: CitationType = None
+    type: Optional[CitationType] = None
     ta_references: List[str] = field(default_factory=list)
     page_range: Optional[str] = None
     series: Optional[str] = None
-    remaining_text: Optional[str] = None
+    remaining_text: str = ''
     page_start: Optional[str] = None
     page_end: Optional[str] = None
-    raw_text: Optional[str] = None
+    raw_text: str = ''
 
     @property
     def fully_parsed(self) -> bool:

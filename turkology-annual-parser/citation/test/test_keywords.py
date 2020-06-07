@@ -1,5 +1,5 @@
-from citation.citation import Citation
-from citation.keywords import normalize_keywords_for_citation
+from domain.citation import Citation
+from ..keywords import normalize_keywords_for_citation
 
 
 def test_normalize_keywords():

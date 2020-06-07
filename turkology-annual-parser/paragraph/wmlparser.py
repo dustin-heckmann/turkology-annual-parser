@@ -1,6 +1,6 @@
 from lxml import etree
 
-from paragraph.paragraph import Paragraph
+from domain.paragraph import Paragraph
 
 
 class WMLParser(object):
@@ -18,7 +18,7 @@ class WMLParser(object):
         for paragraph_index, paragraph_node in enumerate(paragraph_nodes):
             yield Paragraph(
                 originalIndex=paragraph_index,
-                text=self._get_paragraph_text(paragraph_node)
+                text=self._get_paragraph_text(paragraph_node),
             )
 
     def _get_paragraph_text(self, paragraph_node) -> str:

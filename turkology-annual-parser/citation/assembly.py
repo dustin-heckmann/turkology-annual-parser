@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
+import logging
+from typing import Iterable
 
-from typing import Iterator
-
-from citation.intermediate_citation import IntermediateCitation
-from paragraph.paragraph import Paragraph, ParagraphType
+from domain.intermediate_citation import IntermediateCitation
+from domain.paragraph import Paragraph, ParagraphType
 
 
-def assemble_citations(paragraphs: Iterator[Paragraph]):
+def assemble_citations(paragraphs: Iterable[Paragraph]):
     current_keyword = None
     current_citation = None
 
@@ -22,6 +22,10 @@ def assemble_citations(paragraphs: Iterator[Paragraph]):
                 keywords=[current_keyword] if current_keyword else [],
             )
         elif paragraph.type == ParagraphType.AMENDMENT:
-            current_citation.amendments.append(paragraph.text)
+            if current_citation:
+                current_citation.amendments.append(paragraph.text)
+            else:
+                logging.warning(f'Found amendment before a citation. Skipping paragraph: {str(paragraph)}')
+
     if current_citation:
         yield current_citation
