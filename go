@@ -18,7 +18,7 @@ goal_typecheck() {
 
 ##DOC build: build the application
 goal_build() {
-  pipenv install
+  pipenv install --dev
 }
 
 ##DOC clean: remove virtual environment
