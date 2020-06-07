@@ -1,38 +1,39 @@
 import re
+from typing import List, Optional
+
 from dataclasses import dataclass, field
-from typing import List
 
 from citation.citation import CitationType
 
 
 @dataclass
 class IntermediateCitation:
-    volume: int = None
-    number: str = None
-    title: str = None
-    authors: str = None
-    editors: str = None
-    translators: str = None
-    date: str = None
+    volume: Optional[int] = None
+    number: Optional[str] = None
+    title: Optional[str] = None
+    authors: Optional[str] = None
+    editors: Optional[str] = None
+    translators: Optional[str] = None
+    date: Optional[str] = None
     keywords: List[str] = field(default_factory=list)
-    comment: str = None
-    published_in: str = None
-    number_of_pages: str = None
-    number_of_volumes: str = None
-    reviews: str = None
-    abstract_in: str = None
-    location: str = None
+    comment: Optional[str] = None
+    published_in: Optional[str] = None
+    number_of_pages: Optional[str] = None
+    number_of_volumes: Optional[str] = None
+    reviews: Optional[str] = None
+    abstract_in: Optional[str] = None
+    location: Optional[str] = None
     material: List[str] = field(default_factory=list)
     amendments: List[str] = field(default_factory=list)
-    date_published: str = None
+    date_published: Optional[str] = None
     type: CitationType = None
     ta_references: List[str] = field(default_factory=list)
-    page_range: str = None
-    series: str = None
-    remaining_text: str = None
-    page_start: str = None
-    page_end: str = None
-    raw_text: str = None
+    page_range: Optional[str] = None
+    series: Optional[str] = None
+    remaining_text: Optional[str] = None
+    page_start: Optional[str] = None
+    page_end: Optional[str] = None
+    raw_text: Optional[str] = None
 
     @property
     def fully_parsed(self) -> bool:

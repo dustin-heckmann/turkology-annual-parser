@@ -3,7 +3,7 @@
 import logging
 import re
 from dataclasses import replace
-from typing import List, Union, Optional, Iterator
+from typing import List, Union, Optional, Iterator, Iterable
 
 import regex
 
@@ -312,7 +312,7 @@ def find_multiple_authors(citation: Citation, known_authors_pattern) -> Optional
         return citation
 
 
-def find_known_authors(citations: List[Citation], known_authors: Iterator[str]) -> Iterator[Citation]:
+def find_known_authors(citations: List[Citation], known_authors: Iterable[str]) -> Iterator[Citation]:
     known_authors_pattern = '|'.join([re.escape(author.strip().lower()) for author in known_authors])
     for citation in citations:
         if not citation.authors:
