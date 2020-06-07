@@ -103,3 +103,5 @@ venv_ta_parser/
 
 # mypy
 .mypy_cache/
+
+ta-data
