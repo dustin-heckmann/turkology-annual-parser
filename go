@@ -8,7 +8,7 @@ KEYWORDS_FILE=data/keywords.csv
 
 ##DOC test: run all tests
 goal_test() {
-  pipenv run pytest
+  pipenv run pytest -vv
 }
 
 ##DOC typecheck: run typecheck (using mypy)
