@@ -55,9 +55,10 @@ goal_run-docker() {
   pipenv run python $SOURCE_DIR/main.py \
   --input /ta-data/ocr/* \
   --keyword-file /ta-data/keywords.csv \
-  --output /ta-data/ta_citations.json \
   --find-authors \
-  --resolve-repetitions
+  --resolve-repetitions \
+  --output /ta-data/ta_citations.json \
+  --zip-output ta-data/turkology_annual_export.zip
 }
 
 
