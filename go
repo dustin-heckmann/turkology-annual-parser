@@ -1,46 +1,30 @@
 #!/usr/bin/env bash
 set -e -o pipefail
 
-export PYTHONPATH=$PYTHONPATH:$(pwd)/turkology-annual-parser
-VENV_DIR_TA=venv_ta_parser
-PYTHON=$VENV_DIR_TA/bin/python
-PIP=$VENV_DIR_TA/bin/pip
 SOURCE_DIR=turkology-annual-parser
+export PYTHONPATH=$PYTHONPATH:"$(pwd)/$SOURCE_DIR"
 KEYWORDS_FILE=data/keywords.csv
 
-venv() {
-  if [[ ! -d $VENV_DIR_TA ]]; then
-  echo "Initializing virtualenv in $VENV_DIR_TA/..."
-  echo
-    virtualenv $VENV_DIR_TA -p python3
-  else
-    echo "Virtualenv already exists at $VENV_DIR_TA, skipping initialization."
-    echo "To start from a clean state, run ./go clean"
-    echo
-  fi
-}
 
 ##DOC test: run all tests
 goal_test() {
-  ./go build && $PYTHON -m pytest
+  pipenv run pytest
 }
 
 ##DOC build: build the application
 goal_build() {
-  venv
-  $PIP install -r requirements.txt
+  pipenv install
 }
 
 ##DOC clean: remove virtual environment
 goal_clean() {
-  rm -rf $VENV_DIR_TA
+  pipenv clean
 }
 
 ##DOC run: run the application
 goal_run() {
-  venv
   echo "Starting..."
-  $PYTHON $SOURCE_DIR/main.py \
+  pipenv run python $SOURCE_DIR/main.py \
   --find-authors \
   --resolve-repetitions \
   --input ta-data/ocr/* \
