@@ -11,6 +11,11 @@ goal_test() {
   pipenv run pytest -vv
 }
 
+##DOC test: run linter
+goal_lint() {
+  pipenv run flake8 "$SOURCE_DIR"
+}
+
 ##DOC typecheck: run typecheck (using mypy)
 goal_typecheck() {
   pipenv run mypy -p "$SOURCE_DIR"
