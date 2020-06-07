@@ -13,7 +13,7 @@ def replace_text(search_pattern, replacement, paragraph: Paragraph):
 
 def split_paragraph_before(paragraph: Paragraph, split_str):
     text = paragraph.text
-    paragraph.text = ''
+    paragraph = replace(paragraph, text='')
     split_index = text.index(split_str)
     if split_index == -1:
         return [paragraph]
@@ -90,7 +90,7 @@ def correct_volume_25(paragraphs):
         paragraphs[:3771],
         [merge_paragraphs([
             paragraphs[3771],
-            replace_text('1992\..*', '', paragraphs[3775])
+            replace_text(r'1992\..*', '', paragraphs[3775])
         ])],
         paragraphs[3772:3775],
         [replace_text(r'^.+?1992\.', '1992.', paragraphs[3775])],
@@ -165,8 +165,10 @@ def correct_volume_21(paragraphs):
     ])
     return paragraphs
 
+
 def correct_volume_20(paragraphs):
     empty_paragraphs(paragraphs, 2041, 2056)
+
 
 def correct_volume_19(paragraphs):
     paragraphs[3081] = replace_text('^Î48L', '1481.', paragraphs[3081])
@@ -180,6 +182,7 @@ def correct_volume_19(paragraphs):
     paragraphs[3447] = merge_paragraphs([paragraphs[3447], paragraphs[3450]])
     empty_paragraphs(paragraphs, 3450, 3451)
 
+
 def correct_volume_18(paragraphs):
     paragraphs[2997] = merge_paragraphs(paragraphs[2997:2999])
     empty_paragraphs(paragraphs, 2998, 2999)
@@ -189,6 +192,7 @@ def correct_volume_18(paragraphs):
 
     paragraphs[3288] = merge_paragraphs(paragraphs[3288:3290])
     empty_paragraphs(paragraphs, 3289, 3290)
+
 
 def correct_volume_16(paragraphs):
     paragraphs = flatten_list([
@@ -281,12 +285,16 @@ def correct_volume_10(paragraphs):
             paragraphs[4776]
         )],
         [replace_text(
-            r'^í    f    · Die Wirkung der Persönlichkeit Atatürks in der Dritten Welt, s. V ,>        ',
+            ''.join((
+                '^í    f    · ',
+                'Die Wirkung der Persönlichkeit Atatürks in der Dritten Welt, s. V ,>        ',
+            )),
             '• Die Wirkung der Persönlichkeit Atatürks in der Dritten Welt, s.',
             paragraphs[4777]
         )],
         split_paragraph_before(
-            replace_text(r'^.+?462\.', '• Der Einfluß der osmanischen Kalligraphie in Europa, s. 2107 2462.',
+            replace_text(r'^.+?462\.',
+                         '• Der Einfluß der osmanischen Kalligraphie in Europa, s. 2107 2462.',
                          paragraphs[4778]),
             '2462.'
         ),

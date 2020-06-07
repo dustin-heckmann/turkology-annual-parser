@@ -21,7 +21,9 @@ def parse_citation(citation: IntermediateCitation) -> IntermediateCitation:
     if not citation.remaining_text:  # Citation has not already been parsed
         number_text_match = number_rest_pattern.match(citation.raw_text)
         if not number_text_match:
-            raise ValueError(f'Citation does not match basic citation pattern of number & text:\n{str(citation)}')
+            raise ValueError(
+                f'Citation does not match basic citation pattern of number & text:\n{str(citation)}'
+            )
         number, remaining_text = number_text_match.groups()
         citation = replace(citation, number=number, remaining_text=remaining_text)
 
@@ -58,7 +60,8 @@ def parse_review(citation: IntermediateCitation) -> IntermediateCitation:
             citation = replace(
                 citation,
                 abstract_in=review_match.group(2),
-                remaining_text=citation.remaining_text[:review_match.span()[0]] + ' {{{ abstract_in }}}'
+                remaining_text=citation.remaining_text[
+                               :review_match.span()[0]] + ' {{{ abstract_in }}}'
             )
     return citation
 
@@ -88,7 +91,8 @@ def parse_comment(citation: IntermediateCitation) -> IntermediateCitation:
 def parse_location_and_date(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
     loc_date_pattern = re.compile(
-        r'^([^,]+), *((?:\d{1,2}\. *(?:(?:[IVX]{1,4})\. *)?(?:\d{4})?[-—])?\d{1,2}\. *[IVX]{1,4}\. *\d{4})'
+        r'^([^,]+), *((?:\d{1,2}\. *(?:(?:[IVX]{1,4})\. *)?'
+        r'(?:\d{4})?[-—])?\d{1,2}\. *[IVX]{1,4}\. *\d{4})'
     )
     volumes_loc_year_pattern = re.compile(
         r'(\d+) *Bde[.,]+ *(\w+), (\d{4}(?:[-—]\d{4}|(?: *, *\d{4})+)?)(?:, *([\d, +]+) *[Ss]\.)?'
@@ -125,7 +129,8 @@ def parse_location_and_date(citation: IntermediateCitation) -> IntermediateCitat
 def parse_materials(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
     material_pattern = re.compile(
-        r', (\[?\d+\]? *(?:(?:Karte|Tafel|Tabelle|Falt(?:tafel|karte|tabelle))n?|Porträts?|Abb\.|Tab\.|(?:Falt|Schlacht)pl(?:an|äne)))(\.)?'
+        r', (\[?\d+\]? *(?:(?:Karte|Tafel|Tabelle|Falt(?:tafel|karte|tabelle))n?'
+        r'|Porträts?|Abb\.|Tab\.|(?:Falt|Schlacht)pl(?:an|äne)))(\.)?'
     )
     material_spans = []
     for material_match in re.finditer(material_pattern, text):
@@ -190,7 +195,8 @@ def parse_location_year_pages(citation: IntermediateCitation) -> IntermediateCit
 
 def parse_series(citation: IntermediateCitation) -> IntermediateCitation:
     series_pattern = re.compile(
-        r'{{{ (?:number_of_pages|material|date_published) }}}([ .,]*\(([^)]+)\))\. *?(?:$|{{{ comment)'
+        r'{{{ (?:number_of_pages|material|date_published) }}}'
+        r'([ .,]*\(([^)]+)\))\. *?(?:$|{{{ comment)'
     )
     series_match = series_pattern.search(citation.remaining_text)
     if series_match:
@@ -225,7 +231,8 @@ def parse_published_in(citation: IntermediateCitation) -> IntermediateCitation:
 
 def parse_in_missing(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
-    in_missing_pattern = re.compile(r' +([A-Z]+ +(?:\d+(?:-\d+)?)\.(?:\d+(?:-\d+)?\.){2,})(?:[., ]|({{{))')
+    in_missing_pattern = re.compile(
+        r' +([A-Z]+ +(?:\d+(?:-\d+)?)\.(?:\d+(?:-\d+)?\.){2,})(?:[., ]|({{{))')
     in_missing_match = in_missing_pattern.search(text)
     if in_missing_match:
         text = text[:in_missing_match.span()[0]] + ' {{{ in }}}'
@@ -242,12 +249,18 @@ def parse_in_missing(citation: IntermediateCitation) -> IntermediateCitation:
     return citation
 
 
-def parse_title(citation: Union[Citation, IntermediateCitation]) -> Union[Citation, IntermediateCitation]:
+def parse_title(
+        citation: Union[Citation, IntermediateCitation]
+) -> Union[Citation, IntermediateCitation]:
     title_patterns = [
-        re.compile(r'{{{ authors }}}\s*(.+?)\s*{{{ (?:in|editors|translators|number_of_volumes|location) }}}'),
+        re.compile(
+            r'{{{ authors }}}\s*(.+?)\s*'
+            r'{{{ (?:in|editors|translators|number_of_volumes|location) }}}'
+        ),
         re.compile(r'{{{ authors }}}\s*([^.(]+?)[.,]?\s*{{{'),
         re.compile(
-            r'^((?:[^.,(](?!{{{))+?)[.,]?\s*{{{ (?:in|editors|translators|number_of_volumes|comment|location) '
+            r'^((?:[^.,(](?!{{{))+?)[.,]?\s*'
+            r'{{{ (?:in|editors|translators|number_of_volumes|comment|location) '
         ),
     ]
     for title_pattern in title_patterns:
@@ -264,19 +277,23 @@ def parse_title(citation: Union[Citation, IntermediateCitation]) -> Union[Citati
     return citation
 
 
-given_names_pattern = r'(?:\w{1,2}\.(?:-\w{1,2}\.)?|[\w-]+)(?: (?:\w{1,2}\.(?:-\w{1,2}\.)?|[\w-]+)){,3}(?! +\w\.)'
+given_names_pattern = r'(?:\w{1,2}\.(?:-\w{1,2}\.)?|[\w-]+)' \
+                      r'(?: (?:\w{1,2}\.(?:-\w{1,2}\.)?|[\w-]+)){,3}(?! +\w\.)'
 last_name_pattern = r'\*?(?:\w+ ){,2}[\w\'-]+'
 last_name_given_names_pattern = '(?:{}, +{})'.format(last_name_pattern, given_names_pattern)
 given_names_last_name_pattern = '(?:{} +{})'.format(given_names_pattern, last_name_pattern)
 multiple_authors_pattern = re.compile(
-    f'^{last_name_given_names_pattern}(?: *([—-]) *(?:{last_name_given_names_pattern}|{given_names_last_name_pattern}))+ {{3,}}',
-    re.UNICODE)
+    f'^{last_name_given_names_pattern}(?: *([—-]) *(?:{last_name_given_names_pattern}'
+    f'|{given_names_last_name_pattern}))+ {{3,}}',
+    re.UNICODE
+)
 
 
 def parse_authors(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
     author_pattern = re.compile(f'^({last_name_given_names_pattern}) {{2}} +', re.UNICODE)
-    author_pattern_volume_1 = re.compile(r'^(%s\.):?(?<!geb\.) (?!{{{)+' % last_name_given_names_pattern, re.UNICODE)
+    author_pattern_volume_1 = re.compile(
+        r'^(%s\.):?(?<!geb\.) (?!{{{)+' % last_name_given_names_pattern, re.UNICODE)
     multiple_authors_match = multiple_authors_pattern.search(text)
     if multiple_authors_match:
         # multiple_authors_match = multiple_authors_pattern.search(text) # Probably pointless
@@ -342,9 +359,10 @@ def parse_editors_translators(citation: IntermediateCitation) -> IntermediateCit
 
 def find_multiple_authors(citation: Citation, known_authors_pattern) -> Optional[Citation]:
     multiple_authors_pattern = regex.compile(
-        r'^({}){{e<=1}}(?: +(?:—|-) +({}){{e<=1}})+\.?\s+(\p{{Lu}}[^ .]+ .+)'
-            .format(known_authors_pattern, known_authors_pattern),
-            regex.UNICODE | regex.IGNORECASE | regex.DOTALL)
+        f'^({known_authors_pattern}){{e<=1}}(?: +(?:—|-) '
+        fr'+({known_authors_pattern}){{e<=1}})+\.?\s+(\p{{Lu}}[^ .]+ .+)',
+        regex.UNICODE | regex.IGNORECASE | regex.DOTALL
+    )
     authors_match = multiple_authors_pattern.findall(citation.remaining_text)
     if not authors_match:
         return None
@@ -358,8 +376,12 @@ def find_multiple_authors(citation: Citation, known_authors_pattern) -> Optional
     )
 
 
-def find_known_authors(citations: List[Citation], known_authors: Iterable[str]) -> Iterator[Citation]:
-    known_authors_pattern = '|'.join([re.escape(author.strip().lower()) for author in known_authors])
+def find_known_authors(
+        citations: List[Citation],
+        known_authors: Iterable[str]
+) -> Iterator[Citation]:
+    known_authors_pattern = '|'.join(
+        [re.escape(author.strip().lower()) for author in known_authors])
     for citation in citations:
         if not citation.authors:
             citation = (

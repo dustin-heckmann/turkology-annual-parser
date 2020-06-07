@@ -45,6 +45,9 @@ def test_parse_citation_fields():
         authors=[
             Person(first='L.', last='Bazin', raw='Bazin, L.')
         ],
-        raw_text='1. Lexikon der islamischen Welt. Klaus Kreiser, Werner Diem, Hans Georg Majer ed. 3 Bde., Stuttgart, 1974 (Urban-Taschenbücher, 200/1-3).',
-        remaining_text='{{{ title }}}.  {{{ editors }}}   {{{ number_of_volumes }}} {{{ location }}} {{{ date_published }}}{{{ series }}}.'
+        raw_text='1. Lexikon der islamischen Welt. '
+                 'Klaus Kreiser, Werner Diem, Hans Georg Majer ed. '
+                 '3 Bde., Stuttgart, 1974 (Urban-Taschenbücher, 200/1-3).',
+        remaining_text='{{{ title }}}.  {{{ editors }}}   {{{ number_of_volumes }}} '
+                       '{{{ location }}} {{{ date_published }}}{{{ series }}}.'
     )

@@ -24,7 +24,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--input', '-i', nargs='*', help='Location of OCR directory', required=True)
     parser.add_argument('--output', '-o', help='Location of JSON output file', required=True)
-    parser.add_argument('--zip-output', '-z', help='Location of compressed export bundle', required=True)
+    parser.add_argument(
+        '--zip-output', '-z', help='Location of compressed export bundle', required=True
+    )
     parser.add_argument('--keyword-file', help='Path to keyword CSV', required=True)
     parser.add_argument('--find-authors', action='store_true')
     parser.add_argument('--resolve-repetitions', action='store_true')
@@ -133,7 +135,8 @@ def run_full_pipeline_on_volume(
     intermediate_citations = (parse_citation(citation) for citation in raw_citations)
     citations = (parse_citation_fields(citation) for citation in intermediate_citations)
     citations = assign_citation_ids(citations)
-    citations = (normalize_keywords_for_citation(citation, keyword_mapping) for citation in citations)
+    citations = (normalize_keywords_for_citation(citation, keyword_mapping) for citation in
+                 citations)
     for citation in citations:
         queue.put(citation)
     logging.info('DONE: %s', volume_filename)
@@ -142,7 +145,8 @@ def run_full_pipeline_on_volume(
 def get_keyword_mapping(file_name: str) -> Dict[str, Dict[str, str]]:
     with open(file_name, encoding='utf-8') as keyword_file:
         reader = csv.reader(keyword_file, delimiter=';', quotechar='"')
-        keyword_mapping = {code: {'de': name_de, 'en': name_en} for (code, name_de, name_en) in reader}
+        keyword_mapping = {code: {'de': name_de, 'en': name_en} for (code, name_de, name_en) in
+                           reader}
         return keyword_mapping
 
 

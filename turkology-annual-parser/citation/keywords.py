@@ -58,7 +58,8 @@ def extract_keyword_code(raw_keyword):
 def foo(raw_keyword, raw_keyword_match):
     split_code_match = re.search(r'^([A-Z ]+)\.', raw_keyword)  # Extraneous whitespace
     if split_code_match:
-        fixed_raw_keyword = split_code_match.group(1).replace(' ', '') + raw_keyword[raw_keyword.index('.'):]
+        fixed_raw_keyword = split_code_match.group(1).replace(' ', '')\
+                            + raw_keyword[raw_keyword.index('.'):]
         raw_keyword_match = raw_keyword_pattern.fullmatch(fixed_raw_keyword)
     return raw_keyword_match
 

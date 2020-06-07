@@ -25,7 +25,9 @@ def assemble_citations(paragraphs: Iterable[Paragraph]):
             if current_citation:
                 current_citation.amendments.append(paragraph.text)
             else:
-                logging.warning(f'Found amendment before a citation. Skipping paragraph: {str(paragraph)}')
+                logging.warning(
+                    f'Found amendment before a citation. Skipping paragraph: {str(paragraph)}'
+                )
 
     if current_citation:
         yield current_citation

@@ -40,13 +40,17 @@ def test_parser_returns_specific_paragraphs_vol_26():
     assert paragraphs == [
         Paragraph(
             originalIndex=5560,
-            text='3643. Şçerbak, Α. Μ.    Ulangom yazıtı üzerine ilâve düşünceler. In: TDAYB 1994(1996).131-136.',
+            text='3643. Şçerbak, Α. Μ.    '
+                 'Ulangom yazıtı üzerine ilâve düşünceler. In: TDAYB 1994(1996).131-136.',
         ),
         Paragraph(
             originalIndex=5561,
-            text='3644. Scharlipp, Wolfgang-Ε.      Inverted syntax in early Turkish texts. In: TA 26.314.235-243. [Betrifft Alt- und Mitteltürkisch.]',
+            text='3644. Scharlipp, Wolfgang-Ε.      '
+                 'Inverted syntax in early Turkish texts. In: TA 26.314.235-243. '
+                 '[Betrifft Alt- und Mitteltürkisch.]',
         )
     ]
 
 
-def get_xml_path(filename): return os.path.join(os.path.dirname(__file__), '../../../ta-data/ocr/', filename)
+def get_xml_path(filename):
+    return os.path.join(os.path.dirname(__file__), '../../../ta-data/ocr/', filename)

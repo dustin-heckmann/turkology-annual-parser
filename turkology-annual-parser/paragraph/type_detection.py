@@ -33,7 +33,9 @@ def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[st
     keyword_pattern_fuzzy = re.compile(keyword_pattern_base + '{e<=2}', re.IGNORECASE)
     citation_pattern = re.compile(r'(\d+)\.\.?\s+.+', re.DOTALL)
     broken_bullet_pattern = re.compile(r'^[φ#0Φ].*')  # , s\.( a\.)? \d+')
-    page_number_pattern = re.compile(r'(\d+\s+Turkologischer Anzeiger|Turkologischer Anzeiger\s+\d+){e<=2}')
+    page_number_pattern = re.compile(
+        r'(\d+\s+Turkologischer Anzeiger|Turkologischer Anzeiger\s+\d+){e<=2}'
+    )
 
     citation_section_has_begun = False
     latest_citation_number = 0

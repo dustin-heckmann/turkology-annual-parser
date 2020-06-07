@@ -12,7 +12,12 @@ RESOURCES_DIR = '/ta-data/export'
 
 def create_zip_file(dump_file_names: List[str], output_path: str):
     ensure_dir_exists(dirname(output_path))
-    with ZipFile(output_path, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as zip_file_handle:
+    with ZipFile(
+            output_path,
+            'w',
+            compression=zipfile.ZIP_DEFLATED,
+            compresslevel=9
+    ) as zip_file_handle:
         for root, dirs, files in walk(RESOURCES_DIR):
             for file in files:
                 file_name = join(root, file)

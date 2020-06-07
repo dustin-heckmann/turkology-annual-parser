@@ -105,7 +105,8 @@ def parse_amendments(amendment_strings):
     return amendment_strings
 
 
-year_pattern = r'(?:(?P<year>\d{4})|(?P<yearStart>\d{4})[-—/](?P<yearEnd>\d{2}(?:\d{2})?))(?: *\((?P<yearParentheses>\d{4})\))?'
+year_pattern = r'(?:(?P<year>\d{4})|(?P<yearStart>\d{4})[-—/](?P<yearEnd>\d{2}(?:\d{2})?))' \
+               r'(?: *\((?P<yearParentheses>\d{4})\))?'
 pages_pattern = r'(?:S\. ?)?(?P<pageStart>\d+)(?:[-—](?P<pageEnd>\d+))?'
 issues_pattern = r'(?:(?P<issue>\d{1,3})|(?P<issueStart>\d{1,3})[-—](?P<issueEnd>\d{1,3}))'
 volume_pattern = r'(?:(?P<volume>\d{1,2})|(?P<volumeStart>\d{1,2})[-—](?P<volumeEnd>\d{1,2}))'
@@ -113,15 +114,11 @@ journal_pattern = r'(?P<journal>(?:[^\W\d_]|[\- ])+?)'
 
 reference_patterns = [
     ('ta', re.compile(r'^TA *(?P<volume>\d+)\. *(?P<number>\d+)(?:\. *%s)?$' % pages_pattern)),
-
-    # ('volume.issue.year.pages', re.compile('^ *%s *%s\. *%s\. *%s$' % (year_pattern, issues_pattern, pages_pattern))),  # volume.issue.year.pages
-    # ('year.issue.pages', re.compile('^(?P<journal>[\w ]+?) *%s\. *%s\. *%s$' % (year_pattern, issues_pattern, pages_pattern))),  # year.issue.pages
-    # ('issue.year.pages', re.compile('^(?P<journal>[\w ]+?) *%s\. *%s. *%s$' % (issues_pattern, year_pattern, pages_pattern))),  # issue.year.pages
-    # ('year.pages', re.compile('^(?P<journal>[\w ]+?) *%s. *%s$' % (year_pattern, pages_pattern))),  # year.pages
 ]
 reference_patterns.extend(
-    [('journal', re.compile('^' + journal_pattern + ' *' + r'\. *'.join(sub_patterns) + '$', re.UNICODE)) for
-     sub_patterns in [
+    [('journal',
+      re.compile('^' + journal_pattern + ' *' + r'\. *'.join(sub_patterns) + '$', re.UNICODE))
+     for sub_patterns in [
          (volume_pattern, issues_pattern, year_pattern, pages_pattern),
          (volume_pattern, issues_pattern, pages_pattern),
          (year_pattern, issues_pattern, pages_pattern),
@@ -203,7 +200,8 @@ def parse_date(date_str):
         year_end = int(match.group(6))
 
         day_start = int(match.group(1)) if match.group(1) else day_end
-        month_start = roman_numerals.index(match.group(2).lower()) + 1 if match.group(2) else month_end
+        month_start = roman_numerals.index(match.group(2).lower()) + 1 if match.group(
+            2) else month_end
         year_start = int(match.group(3)) if match.group(3) else year_end
 
         try:
