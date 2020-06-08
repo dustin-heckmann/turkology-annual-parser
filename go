@@ -43,6 +43,14 @@ goal_run() {
   --zip-output ta-data/turkology_annual_export.zip
 }
 
+##DOC precommit: run build, lint, typecheck, test
+goal_precommit() {
+  goal_build
+  goal_lint
+  goal_typecheck
+  goal_test
+}
+
 ##DOC build-docker: build the application inside a docker container
 goal_build-docker() {
   pip install --upgrade pip
