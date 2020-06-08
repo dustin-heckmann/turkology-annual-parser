@@ -9,7 +9,7 @@ from typing import Dict, List, Set
 from citation.assembly import assemble_citations
 from citation.citation_parsing import find_known_authors, parse_citation
 from citation.field_parsing import parse_citation_fields
-from citation.ids import assign_citation_ids
+from citation.id_assignment import assign_citation_ids
 from citation.keywords import normalize_keywords_for_citation
 from compression import create_zip_file
 from domain.citation import Citation
