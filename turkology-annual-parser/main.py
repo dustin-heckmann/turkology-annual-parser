@@ -4,10 +4,11 @@ import logging
 import multiprocessing
 import os
 from multiprocessing.queues import Queue
-from typing import Dict, List, Set
+from typing import Dict, List
 
+from bootstrap.authors import reparse_citations_using_known_authors
 from citation.assembly import assemble_citations
-from citation.citation_parsing import find_known_authors, parse_citation
+from citation.citation_parsing import parse_citation
 from citation.field_parsing import parse_citation_fields
 from citation.id_assignment import assign_citation_ids
 from citation.keywords import normalize_keywords_for_citation
@@ -43,40 +44,6 @@ def main():
         citations = resolve_repetitions(citations)
     save_citations(citations, args.output)
     create_export_bundle(args.output, args.zip_output)
-
-
-HARDCODED_AUTHORS = {
-    'Condurachi, Em',
-    'Kakük, Z',
-    'Yoman, Yakut',
-    'Kobeneva, T. A',
-    'Djukanovic, Marija',
-    'Zagorka Janc',
-    'Sohbweide, Hanna',
-    'Tübkay, Cevdet',
-    'Eren, ismail',
-    'Baysal,   Jale',
-    'Spiridonakis, B. G',
-    'Uçankuş, Hasan T',
-    'Landau, Jacob M',
-    'Özeğe, Seyfettin',
-}
-
-
-def find_authors(citations: List[Citation]):
-    known_authors = get_known_authors_from_citations(citations)
-    known_authors.update(HARDCODED_AUTHORS)
-    logging.info('Found {} distinct authors'.format(len(known_authors)))
-    return find_known_authors(citations, known_authors)
-
-
-def get_known_authors_from_citations(citations: List[Citation]) -> Set[str]:
-    known_authors = set()
-    for citation in citations:
-        for author in citation.authors:
-            if author.raw:
-                known_authors.add(author.raw)
-    return known_authors
 
 
 def save_citations(citations: List[Citation], output_filename: str) -> None:
