@@ -16,7 +16,7 @@ from domain.citation import Citation
 from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
-from repetitions import add_repeated_info
+from repetitions import resolve_repetitions
 from repositories.JsonRepository import JsonRepository
 
 
@@ -77,11 +77,6 @@ def get_known_authors_from_citations(citations: List[Citation]) -> Set[str]:
             if author.raw:
                 known_authors.add(author.raw)
     return known_authors
-
-
-def resolve_repetitions(citations: List[Citation]):
-    logging.info('Resolving repetitions...')
-    return add_repeated_info(citations)
 
 
 def save_citations(citations: List[Citation], output_filename: str) -> None:
