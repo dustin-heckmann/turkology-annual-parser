@@ -1,11 +1,19 @@
 #!/usr/bin/env bash
+
+# This script contains all tasks related to building, testing and running the application
+
+## Adding a new task:
+# 1. To add a task named 'example', implement it as a function named 'goal_example()'
+# 2. Above the function name, add a usage hint, e.g. '##DOC: example: this is an example'
+#    -> Usage hints will be displayed when running this script without any argument or with an unknown argument
+# 3. The task can now be run with `./go example`
+
+
 set -e -o pipefail
+BASE_DIR="$(dirname $0)"
+SOURCE_DIR="$BASE_DIR/turkology-annual-parser"
 
-SOURCE_DIR=turkology-annual-parser
-export PYTHONPATH=$PYTHONPATH:"$(pwd)/$SOURCE_DIR"
-KEYWORDS_FILE=data/keywords.csv
-
-
+## Tasks  ================================================================================
 ##DOC test: run all tests
 goal_test() {
   pipenv run pytest -vv
@@ -18,7 +26,7 @@ goal_lint() {
 
 ##DOC typecheck: run typecheck (using mypy)
 goal_typecheck() {
-  pipenv run mypy -p "$SOURCE_DIR"
+  pipenv run mypy -p $(basename "$SOURCE_DIR")
 }
 
 ##DOC build: build the application
@@ -28,19 +36,20 @@ goal_build() {
 
 ##DOC clean: remove virtual environment
 goal_clean() {
-  pipenv clean
+  pipenv --rm
 }
 
 ##DOC run: run the application
 goal_run() {
+  DATA_DIR=${1:-"$BASE_DIR/ta-data"}
   echo "Starting..."
   pipenv run python $SOURCE_DIR/main.py \
   --find-authors \
   --resolve-repetitions \
-  --input ta-data/ocr/* \
-  --keyword-file ta-data/keywords.csv \
-  --output ta-data/ta_citations.json \
-  --zip-output ta-data/turkology_annual_export.zip
+  --input "$DATA_DIR"/ocr/* \
+  --keyword-file "$DATA_DIR/keywords.csv" \
+  --output "$DATA_DIR/ta_citations.json" \
+  --zip-output "$DATA_DIR/turkology_annual_export.zip"
 }
 
 ##DOC precommit: run build, lint, typecheck, test
@@ -60,20 +69,9 @@ goal_build-docker() {
 
 ##DOC run-docker: run the application inside a docker container
 goal_run-docker() {
-  pipenv run python $SOURCE_DIR/main.py \
-  --input /ta-data/ocr/* \
-  --keyword-file /ta-data/keywords.csv \
-  --find-authors \
-  --resolve-repetitions \
-  --output /ta-data/ta_citations.json \
-  --zip-output ta-data/turkology_annual_export.zip
+  goal_run "/ta-data"
 }
+## ========================================================================================
 
-
-if type -t "goal_$1" &>/dev/null; then
-  "goal_$1" "${@:2}"
-else
-  echo "usage: $0 <goal>"
-  grep -e "^##DOC" <"$(basename "$0")" | sed "s/^##DOC \(.*\)/  \1/"
-  exit 1
-fi
+## Include go.helpers script which invokes specified task or prints usage hint
+source "$BASE_DIR/go.helpers"
