@@ -39,7 +39,7 @@ def main():
     citations = run_full_pipeline(args.input, args.keyword_file)
 
     if args.find_authors:
-        citations = find_authors(citations)
+        citations = reparse_citations_using_known_authors(citations)
     if args.resolve_repetitions:
         citations = resolve_repetitions(citations)
     save_citations(citations, args.output)
