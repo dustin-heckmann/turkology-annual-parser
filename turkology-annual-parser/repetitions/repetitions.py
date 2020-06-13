@@ -42,11 +42,14 @@ def add_repeated_info_to_citations(citations, repetitions_by_citation) -> List[C
 
 
 def add_repeated_info_to_citation(citation, repetitions):
+    added_comments = added_amendments = added_reviews = []
     for repetition in repetitions:
-        citation = replace(
-            citation,
-            comments=citation.comments + repetition.comments,
-            amendments=citation.amendments + repetition.amendments,
-            reviews=citation.reviews + repetition.reviews,
-        )
-    return citation
+        added_comments.extend(repetition.comments)
+        added_amendments.extend(repetition.amendments)
+        added_reviews.extend(repetition.reviews)
+    return replace(
+        citation,
+        comments=citation.comments + added_comments,
+        amendments=citation.amendments + added_amendments,
+        reviews=citation.reviews + added_reviews,
+    )

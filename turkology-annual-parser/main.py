@@ -16,7 +16,7 @@ from domain.citation import Citation
 from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
-from repetitions import resolve_repetitions
+from repetitions.repetitions import resolve_repetitions
 from repositories.JsonRepository import JsonRepository
 
 
