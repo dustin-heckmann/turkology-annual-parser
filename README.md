@@ -1,7 +1,7 @@
 # turkology-annual-parser
 Parser for Turkology Annual Online.
 
-Parses OCR output (WordprocessingML) and stores resulting citations in a JSON file.
+Parses OCR output and stores extracted citations in a JSON file.
  
 The OCR output was obtained in the
 [Turkology Annual Online](http://www.asia-europe.uni-heidelberg.de/en/research/heidelberg-research-architecture/projects/turkology-annual.html)
@@ -12,12 +12,13 @@ The Turkology Annual is published by the
 of the [University of Vienna](https://www.univie.ac.at/).
 
 ### Requirements
-* [Python 3.7+](https://www.python.org/)
-* [virtualenv](https://pypi.org/project/virtualenv/)
+* [Python](https://www.python.org/) >= 3.7
+* [pipenv](https://pipenv.pypa.io/en/latest/)
 
-### Run tests
-```./go test```
+### Build / Test / Run / ...
+All tasks related to building, testing, and running can be invoked with the `./go` script.<br/>
+Run `./go` without any argument to see a list of all available tasks.
 
-### Start application
+**NOTE**: You need _bash_ to run the `./go` script.
+If you prefer to execute those tasks manually, you can use the script as documentation.
 
-```./go run```
