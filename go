@@ -11,7 +11,7 @@ goal_test() {
   pipenv run pytest -vv
 }
 
-##DOC test: run linter
+##DOC lint: run linter
 goal_lint() {
   pipenv run flake8 "$SOURCE_DIR"
 }
