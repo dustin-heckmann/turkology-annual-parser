@@ -2,7 +2,7 @@ from queue import Queue
 
 from bootstrap.authors import insert_known_authors
 from citation.citation_parsing import parse_citation
-from citation.field_parsing import parse_citation_fields
+from citation.field_parsing import parse_fields_in_citation
 from domain.citation import Citation, CitationType, Person
 from domain.intermediate_citation import IntermediateCitation
 
@@ -17,7 +17,7 @@ def test_insert_known_authors():
         'im Rahmen der Arbeiten des Orientalischen Instituts in Sarajevo, Jugoslavien.]',
     ))
     raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
-    parsed_citation = parse_citation_fields(parse_citation(raw_citation))
+    parsed_citation = parse_fields_in_citation(parse_citation(raw_citation))
     queue = Queue()
     insert_known_authors([parsed_citation], ['Handžić, Adem'], queue)
 

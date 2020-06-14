@@ -1,5 +1,6 @@
 import re
 from datetime import date
+from typing import Iterable
 
 import nameparser
 
@@ -7,7 +8,11 @@ from domain.citation import Citation, Person
 from domain.intermediate_citation import IntermediateCitation
 
 
-def parse_citation_fields(intermediate: IntermediateCitation) -> Citation:
+def parse_citation_fields(citations: Iterable[IntermediateCitation]) -> Iterable[Citation]:
+    return (parse_fields_in_citation(citation) for citation in citations)
+
+
+def parse_fields_in_citation(intermediate: IntermediateCitation) -> Citation:
     reviews, comments = parse_amendments_or_comments([intermediate.comment])
     more_reviews, amendments = parse_amendments_or_comments(intermediate.amendments)
     reviews.extend(more_reviews)

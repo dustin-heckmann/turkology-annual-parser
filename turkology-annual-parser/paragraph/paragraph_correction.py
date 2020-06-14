@@ -2,7 +2,7 @@
 import re
 from dataclasses import replace
 from operator import attrgetter
-from typing import List
+from typing import Iterable
 
 from domain.paragraph import Paragraph
 
@@ -36,7 +36,8 @@ def empty_paragraphs(paragraphs, lower_bound, upper_bound):
         paragraphs[i] = None
 
 
-def correct_paragraphs(paragraphs: List[Paragraph]):
+def correct_paragraphs(paragraphs: Iterable[Paragraph]) -> Iterable[Paragraph]:
+    paragraphs = list(paragraphs)
     volume = paragraphs[0].volume
     if volume == 1:
         correct_volume_1(paragraphs)

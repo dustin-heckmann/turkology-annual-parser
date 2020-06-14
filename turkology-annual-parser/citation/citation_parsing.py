@@ -3,12 +3,16 @@
 import logging
 import re
 from dataclasses import replace
-from typing import Union
+from typing import Union, Iterable
 
 from domain.citation import Citation, CitationType
 from domain.intermediate_citation import IntermediateCitation
 
 number_rest_pattern = re.compile(r'(\d+)\.\s*(.+)', re.DOTALL)
+
+
+def parse_citations(citations: Iterable[IntermediateCitation]) -> Iterable[IntermediateCitation]:
+    return (parse_citation(citation) for citation in citations)
 
 
 def parse_citation(citation: IntermediateCitation) -> IntermediateCitation:

@@ -1,7 +1,7 @@
 from domain.citation import CitationType
 from domain.intermediate_citation import IntermediateCitation
 from ..citation_parsing import parse_citation
-from ..field_parsing import parse_citation_fields
+from ..field_parsing import parse_fields_in_citation
 
 
 def test_parse_citation():
@@ -88,7 +88,7 @@ def test_ta_reference():
 
 def parse_citation_and_fields(raw_text):
     raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
-    parsed_citation = parse_citation_fields(
+    parsed_citation = parse_fields_in_citation(
         parse_citation(raw_citation)
     )
     return parsed_citation

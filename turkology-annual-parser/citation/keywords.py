@@ -1,11 +1,17 @@
 import re
 from dataclasses import replace
 from operator import itemgetter
-from typing import Dict
+from typing import Dict, Iterable
 
 from domain.citation import Citation
 
 raw_keyword_pattern = re.compile(r'(?P<code>[A-Za-z]+)(?:\..+)?')
+
+
+def normalize_keywords(
+        citations: Iterable[Citation], keyword_mapping: Dict[str, Dict[str, str]]
+) -> Iterable[Citation]:
+    return (normalize_keywords_for_citation(citation, keyword_mapping) for citation in citations)
 
 
 def normalize_keywords_for_citation(citation: Citation, keyword_mapping: Dict[str, Dict[str, str]]):
@@ -58,7 +64,7 @@ def extract_keyword_code(raw_keyword):
 def foo(raw_keyword, raw_keyword_match):
     split_code_match = re.search(r'^([A-Z ]+)\.', raw_keyword)  # Extraneous whitespace
     if split_code_match:
-        fixed_raw_keyword = split_code_match.group(1).replace(' ', '')\
+        fixed_raw_keyword = split_code_match.group(1).replace(' ', '') \
                             + raw_keyword[raw_keyword.index('.'):]
         raw_keyword_match = raw_keyword_pattern.fullmatch(fixed_raw_keyword)
     return raw_keyword_match

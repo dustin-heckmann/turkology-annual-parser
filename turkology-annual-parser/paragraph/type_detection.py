@@ -1,5 +1,5 @@
 from dataclasses import replace
-from typing import Dict, List
+from typing import Dict, Iterable
 
 import regex as re
 
@@ -20,7 +20,9 @@ KNOWN_CITATION_GAPS_BY_VOLUME = {  # Ranges are inclusive
 }
 
 
-def detect_paragraph_types(paragraphs: List[Paragraph], keyword_mapping: Dict[str, Dict[str, str]]):
+def detect_paragraph_types(
+        paragraphs: Iterable[Paragraph], keyword_mapping: Dict[str, Dict[str, str]]
+):
     journal_section_begin_pattern = re.compile('ZEITSCHRIFTEN +UND')
     journal_pattern = re.compile('')
     keyword_pattern_base = '({})'.format(

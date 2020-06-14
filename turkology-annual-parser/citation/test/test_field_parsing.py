@@ -1,6 +1,6 @@
 from domain.citation import Citation, Person, CitationType
-from ..field_parsing import parse_citation_fields
 from domain.intermediate_citation import IntermediateCitation
+from ..field_parsing import parse_fields_in_citation
 
 CITATION = IntermediateCitation(
     remaining_text='{{{ title }}}.  {{{ editors }}}   {{{ number_of_volumes }}} '
@@ -23,7 +23,7 @@ CITATION = IntermediateCitation(
 
 
 def test_parse_citation_fields():
-    field_parsed_citation = parse_citation_fields(CITATION)
+    field_parsed_citation = parse_fields_in_citation(CITATION)
 
     assert field_parsed_citation == Citation(
         volume=1,
