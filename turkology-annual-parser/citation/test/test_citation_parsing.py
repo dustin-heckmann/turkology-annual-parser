@@ -32,6 +32,46 @@ def test_parse_citation():
     )
 
 
+def test_parse_location_year_pages():
+    # given
+    citation = IntermediateCitation(remaining_text='1. Berlin, 1990, 234 S.')
+
+    # when
+    citation = parse_citation(citation)
+
+    # then
+    assert citation.location == 'Berlin'
+    assert citation.date_published == '1990'
+    assert citation.number_of_pages == '234'
+
+
+def test_parse_location_year_pages_roman():
+    # given
+    citation = IntermediateCitation(remaining_text='1. Çankırı, 1999, XII+614S.')
+
+    # when
+    citation = parse_citation(citation)
+
+    # then
+    assert citation.location == 'Çankırı'
+    assert citation.date_published == '1999'
+    assert citation.number_of_pages == 'XII+614'
+
+
+def test_parse_location_year_page_range():
+    # given
+    citation = IntermediateCitation(remaining_text='1. Çankırı, 1999, S. 100-130')
+
+    # when
+    citation = parse_citation(citation)
+
+    # then
+    assert citation.location == 'Çankırı'
+    assert citation.date_published == '1999'
+    assert citation.page_start == '100'
+    assert citation.page_end == '130'
+
+
 def test_parse_collection():
     raw_text = '98. Russian colonial expansion to 1917. Eingeleitet von Sy ed Z. abedin. ' \
                'Michael Rywkin ed. London, 1988, XVΠ+274 S.'
@@ -84,6 +124,24 @@ def test_ta_reference():
     assert parsed_citation.published_in['pageStart'] == 61
     assert parsed_citation.published_in['pageEnd'] == 67
     assert parsed_citation.published_in['type'] == 'ta'
+
+
+def test_review():
+    # given
+    citation = (
+        "65. Özeğe, Seyfettin. Eski harflerle basılmış Türkçe eserler katalogu. "
+        "Bd. 1, (Lieferung 1-27), A-F, istanbul, 1971-1973, S. 1-428. "
+        "Bd. 2 (Lieferung 28-44), G-Ilm, Istanbul, 1973-1974, S. 437-704. "
+        "[Katalog der türkischen Druckwerke in arabischer Schrift, "
+        "nach Titeln alphabetisch gereiht. Der 2. Bd. ist noch nicht abgeschlossen.] "
+        "Rez. Özcan Mebt, GDAAD 2-3.1973-74.507-510."
+    )
+
+    # when
+    parsed_citation = parse_citation(IntermediateCitation(remaining_text=citation))
+
+    # then
+    assert parsed_citation.reviews == 'Özcan Mebt, GDAAD 2-3.1973-74.507-510.'
 
 
 def parse_citation_and_fields(raw_text):
