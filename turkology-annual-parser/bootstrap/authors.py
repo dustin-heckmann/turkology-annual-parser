@@ -33,13 +33,14 @@ def insert_known_authors(
     known_authors_pattern = '|'.join(
         [re.escape(author.strip().lower()) for author in known_authors])
     for citation in citations:
-        if not citation.authors:
-            citation = (
+        if not citation.fully_parsed() and not citation.authors:
+            citation_with_authors = (
                     find_multiple_authors(citation, known_authors_pattern)
                     or find_single_author(citation, known_authors_pattern)
-                    or citation
             )
-        yield reparse_citation(citation)
+            if citation_with_authors:
+                citation = reparse_citation(citation_with_authors)
+        yield citation
 
 
 def find_multiple_authors(citation: Citation, known_authors_pattern) -> Optional[Citation]:
