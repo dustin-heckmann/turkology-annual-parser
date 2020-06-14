@@ -25,6 +25,8 @@ def run_pipeline(
         resolve_repetitions=False
 ) -> List[Citation]:
     keyword_mapping = get_keyword_mapping(keyword_file)
+
+    logging.info(f'Parsing {len(ocr_files)} volumes...')
     m = multiprocessing.Manager()
     queue = m.Queue()
     with multiprocessing.Pool() as pool:
@@ -50,8 +52,6 @@ def run_full_pipeline_on_volume(
         keyword_mapping: Dict[str, Dict[str, str]],
         queue: Queue
 ) -> None:
-    logging.info("START: %s", volume_filename)
-
     logging.debug('Extracting paragraphs...')
     paragraphs = list(extract_paragraphs(volume_filename))
 
@@ -72,4 +72,4 @@ def run_full_pipeline_on_volume(
                  citations)
     for citation in citations:
         queue.put(citation)
-    logging.info('DONE: %s', volume_filename)
+    logging.info(f'{os.path.basename(volume_filename)} [DONE]')
