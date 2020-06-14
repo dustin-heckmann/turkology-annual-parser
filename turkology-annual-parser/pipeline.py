@@ -1,5 +1,6 @@
 import logging
 import multiprocessing
+import os
 from queue import Queue
 from typing import List, Dict
 
@@ -10,7 +11,7 @@ from citation.field_parsing import parse_citation_fields
 from citation.id_assignment import assign_citation_ids
 from citation.keywords import normalize_keywords_for_citation
 from domain.citation import Citation
-from keywords.keyword_mapping import get_keyword_mapping
+from keywords import get_keyword_mapping
 from paragraph.paragraph_correction import correct_paragraphs
 from paragraph.paragraph_extraction import extract_paragraphs
 from paragraph.type_detection import detect_paragraph_types
