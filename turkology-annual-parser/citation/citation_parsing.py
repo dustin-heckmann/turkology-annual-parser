@@ -3,10 +3,11 @@
 import logging
 import re
 from dataclasses import replace
-from typing import Union, Iterable
+from typing import Iterable, Union
 
-from domain.citation import Citation, CitationType
+from domain.citation import CitationType, Citation
 from domain.intermediate_citation import IntermediateCitation
+from .re_helpers import group
 
 number_rest_pattern = re.compile(r'(\d+)\.\s*(.+)', re.DOTALL)
 
@@ -28,39 +29,43 @@ def parse_citation(citation: IntermediateCitation) -> IntermediateCitation:
         number, remaining_text = number_text_match.groups()
         citation = replace(citation, number=number, remaining_text=remaining_text)
 
-    for parse_function in (
-            parse_review,
-            parse_comment,
-            parse_location_and_date,
-            parse_materials,
-            parse_location_year_pages,
-            parse_series,
-            parse_published_in,
-            parse_in_missing,
-            parse_authors,
-            parse_editors_translators,
-            parse_title,
-    ):
-        citation = parse_function(citation)
-    return citation
+    return pipeline(
+        lambda: citation,
+        parse_review,
+        parse_comment,
+        parse_location_and_date,
+        parse_materials,
+        parse_location_year_pages,
+        parse_volumes_loc_year,
+        parse_series,
+        parse_published_in,
+        parse_in_missing,
+        parse_authors,
+        parse_editors_translators,
+        parse_title,
+    )
 
 
 def parse_review(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
-    review_pattern = re.compile(r' +(Rez\.|Abstract +in:) (.*)$')
+    review_marker = group(r'Rez\.', 'review_marker')
+    abstract_marker = group('Abstract +in:', 'abstract_marker')
+    reviews_or_abstracts = group('.*', 'reviews_or_abstracts')
+    review_pattern = re.compile(rf' +{review_marker | abstract_marker} {reviews_or_abstracts}$')
+
     review_match = review_pattern.search(text)
     if review_match:
-        review_type = review_match.group(1)
-        if review_type == 'Rez.':
+        items = review_match.group('reviews_or_abstracts')
+        if review_match.group('review_marker'):
             citation = replace(
                 citation,
-                reviews=review_match.group(2),
+                reviews=items,
                 remaining_text=citation.remaining_text[:review_match.span()[0]] + ' {{{ reviews }}}'
             )
-        elif re.sub(' {2,}', ' ', review_type).lower() == 'abstract in:':
+        elif review_match.group('abstract_marker'):
             citation = replace(
                 citation,
-                abstract_in=review_match.group(2),
+                abstract_in=items,
                 remaining_text=citation.remaining_text[
                                :review_match.span()[0]] + ' {{{ abstract_in }}}'
             )
@@ -69,56 +74,81 @@ def parse_review(citation: IntermediateCitation) -> IntermediateCitation:
 
 def parse_comment(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
-    comment_pattern = re.compile(r'\[([^\]]+)\]\.?( {{{ reviews }}})?$')
-    ta_references_pattern = re.compile(r's\. (?:TA \d+(?:-\d+)?\.\d+)(?:, \d(?:-\d+)?\.\d+)*')
+    comment = group(r'[^\]]+', 'comment')
+    reviews_placeholder = group(' {{{ reviews }}}', 'reviews_placeholder', optional=True)
+    comment_pattern = re.compile(rf'\[{comment}\]\.?{reviews_placeholder}$')
     comment_match = comment_pattern.search(text)
     if not comment_match:
         return citation
 
-    comment = comment_match.group(1).strip().rstrip('.')
-    ta_references_match = ta_references_pattern.fullmatch(comment)
+    ta_references_pattern = re.compile(r's\. (?:TA \d+(?:-\d+)?\.\d+)(?:, \d(?:-\d+)?\.\d+)*')
+    comment_text = comment_match.group('comment').strip().rstrip('.')
+    ta_references_match = ta_references_pattern.fullmatch(comment_text)
     if ta_references_match:
         comment_field_name = 'ta_references'
-        citation = replace(citation, ta_references=comment)
+        citation = replace(citation, ta_references=comment_text)
     else:
         comment_field_name = 'comment'
-        citation = replace(citation, comment=comment)
+        citation = replace(citation, comment=comment_text)
     text = text[:comment_match.span()[0]] + ' {{{ %s }}}' % comment_field_name
-    if comment_match.group(2):
-        text += comment_match.group(2)
+    text += comment_match.group('reviews_placeholder') or ''
     return replace(citation, remaining_text=text)
 
 
 def parse_location_and_date(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
-    loc_date_pattern = re.compile(
-        r'^([^,]+), *((?:\d{1,2}\. *(?:(?:[IVX]{1,4})\. *)?'
-        r'(?:\d{4})?[-—])?\d{1,2}\. *[IVX]{1,4}\. *\d{4})'
+    location = group(r'[^,]+', 'location')
+    date = group(
+        r'(?:\d{1,2}\. *(?:(?:[IVX]{1,4})\. *)?(?:\d{4})?[-—])?\d{1,2}\. *[IVX]{1,4}\. *\d{4}',
+        'date'
     )
-    volumes_loc_year_pattern = re.compile(
-        r'(\d+) *Bde[.,]+ *(\w+), (\d{4}(?:[-—]\d{4}|(?: *, *\d{4})+)?)(?:, *([\d, +]+) *[Ss]\.)?'
-    )
+
+    loc_date_pattern = re.compile(rf'^{location}, *{date}')
+
     match = loc_date_pattern.search(text)
     if match:
         citation = replace(
             citation,
-            location=match.group(1),
-            date=match.group(2),
+            location=match.group('location'),
+            date=match.group('date'),
             type=CitationType.CONFERENCE,
         )
         text = '{{{ location }}} {{{ date }}} ' + text[match.span()[1]:]
+    return replace(citation, remaining_text=text)
 
+
+def parse_volumes_loc_year(citation: IntermediateCitation) -> IntermediateCitation:
+    text = citation.remaining_text
+    number_of_volumes = group(r'\d+', 'number_of_volumes')
+    location = group(r'\w+', 'location')
+    date_published = group(r'\d{4}(?:[-—]\d{4}|(?:\s*,\s*\d{4})+)?', 'date_published')
+    number_of_pages = group(r'[\d, +]+', 'number_of_pages')
+    volumes_loc_year_pattern = re.compile(
+        rf'''
+            {number_of_volumes}
+            \s*Bde[.,]+\s*
+            {location}
+            ,\s
+            {date_published}
+            (?:,\s*
+            {number_of_pages}
+            \s*[Ss]\.)?
+            ''', re.VERBOSE
+    )
     match = volumes_loc_year_pattern.search(text)
     if match:
         citation = replace(
             citation,
-            number_of_volumes=match.group(1),
-            location=match.group(2),
-            date_published=match.group(3),
+            number_of_volumes=match.group('number_of_volumes'),
+            location=match.group('location'),
+            date_published=match.group('date_published'),
         )
 
-        if match.group(4):
-            citation = replace(citation, number_of_pages=match.group(4).strip())
+        if match.group('number_of_pages'):
+            citation = replace(
+                citation,
+                number_of_pages=match.group('number_of_pages').strip()
+            )
         text = ''.join((
             text[:match.span()[0]],
             ' {{{ number_of_volumes }}} {{{ location }}} {{{ date_published }}} ',
@@ -151,38 +181,47 @@ def parse_materials(citation: IntermediateCitation) -> IntermediateCitation:
 
 def parse_location_year_pages(citation: IntermediateCitation) -> IntermediateCitation:
     text = citation.remaining_text
+
+    location = group('[^,.?]+', 'location')
+    year = group(r'\d{4}', 'year')
+    number_of_pages = group(r'[\d +DCLIVX]+', 'number_of_pages')
+    page_start = group(r'\d+', 'page_start')
+    page_end = group(r'\d+', 'page_end')
+    _hyphen = r'\s*[-—]\s*'
+
     loc_year_pages_pattern = re.compile(
-        r'([.,?]) +\[?'
-        r'([^,.?]+)'  # location
-        r', *\[?'  # comma, 0+ spaces, maybe opening square bracket
-        r'(\d{4})'  # date_published (year)
-        r'\]?[,.] *'
-        r'(?:'
-        r'([\d +DCLIVX]+)'  # number of pages (arabic / roman)
-        r' *[Ss]\.|[Ss]\. '  # S. (abbreviation for "Seiten")
-        r'(\d+)'  # pageStart
-        r'\s*[-—]\s*'
-        r'(\d+))'  # pageEnd
+        rf'''
+        ([.,?])\ +\[?
+        {location}
+        ,\ *\[?
+        {year}
+        \]?[,.]\ *
+        (?:
+            {number_of_pages}\ *[Ss]\.
+        |
+            [Ss]\.\ {page_start}{_hyphen}{page_end}
+        )
+        ''', re.VERBOSE
     )
     loc_year_pages_match = loc_year_pages_pattern.search(text)
     if loc_year_pages_match:
         citation = replace(
             citation,
-            location=loc_year_pages_match.group(2).strip(),
-            date_published=loc_year_pages_match.group(3),
+            location=loc_year_pages_match.group('location').strip(),
+            date_published=loc_year_pages_match.group('year'),
         )
 
-        if loc_year_pages_match.group(4):
+        if loc_year_pages_match.group('number_of_pages'):
             # numberOfPages
             citation = replace(
                 citation,
-                number_of_pages=loc_year_pages_match.group(4).strip()
+                number_of_pages=loc_year_pages_match.group('number_of_pages').strip()
             )
         else:
             citation = replace(
                 citation,
-                page_start=loc_year_pages_match.group(5),
-                page_end=loc_year_pages_match.group(6),
+                page_start=loc_year_pages_match.group('page_start'),
+                page_end=loc_year_pages_match.group('page_end'),
             )
 
         text = ''.join((
@@ -213,17 +252,20 @@ def parse_series(citation: IntermediateCitation) -> IntermediateCitation:
 
 
 def parse_published_in(citation: IntermediateCitation) -> IntermediateCitation:
-    in_pattern = re.compile(r' +In ?: +([^.]+ *[\d.\-— ();,*S/=und]+)(?:[.,]|({{{))')
+    published_in = group(r'[^.]+ *[\d.\-— ();,*S/=und]+', 'published_in')
+    delimiter = group('({{{)', 'delimiter')
+    in_pattern = re.compile(rf'\s+In\s?: +{published_in}(?:[.,]|{delimiter})')
+
     in_match = in_pattern.search(citation.remaining_text)
     if in_match:
         text = citation.remaining_text[:in_match.span()[0]] + ' {{{ in }}}'
-        if in_match.group(2):
+        if in_match.group('delimiter'):
             text += text[in_match.span(2)[1]:]
         else:
             text += text[in_match.span()[1]:]
         return replace(
             citation,
-            published_in=in_match.group(1),
+            published_in=in_match.group('published_in'),
             type=CitationType.ARTICLE,
             remaining_text=text,
         )
@@ -297,7 +339,6 @@ def parse_authors(citation: IntermediateCitation) -> IntermediateCitation:
         r'^(%s\.):?(?<!geb\.) (?!{{{)+' % last_name_given_names_pattern, re.UNICODE)
     multiple_authors_match = multiple_authors_pattern.search(text)
     if multiple_authors_match:
-        # multiple_authors_match = multiple_authors_pattern.search(text) # Probably pointless
         return replace(
             citation,
             authors=multiple_authors_match.group(),
@@ -362,3 +403,10 @@ def reparse_citation(citation: Citation) -> Citation:
     if not citation.title:
         citation = parse_title(citation)
     return citation
+
+
+def pipeline(*steps):
+    result = steps[0]()
+    for step in steps[1:]:
+        result = step(result)
+    return result
