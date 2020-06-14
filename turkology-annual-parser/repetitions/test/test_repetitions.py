@@ -1,5 +1,5 @@
 from domain.citation import Citation, CitationType
-from ..repetitions import resolve_repetitions
+from ..repetitions import extend_citations_with_later_added_info
 
 
 def test_sets_citation_type_to_repetition():
@@ -10,7 +10,7 @@ def test_sets_citation_type_to_repetition():
     ]
 
     # when
-    actual_citations = resolve_repetitions(citations)
+    actual_citations = extend_citations_with_later_added_info(citations)
 
     # then
     assert actual_citations[1].type == CitationType.REPETITION
@@ -29,7 +29,7 @@ def test_adds_comments_from_repetition():
     ]
 
     # when
-    actual_citations = resolve_repetitions(citations)
+    actual_citations = extend_citations_with_later_added_info(citations)
 
     # then
     assert actual_citations[0].comments == ['A comment']
@@ -48,7 +48,7 @@ def test_adds_amendments_from_repetition():
     ]
 
     # when
-    actual_citations = resolve_repetitions(citations)
+    actual_citations = extend_citations_with_later_added_info(citations)
 
     # then
     assert actual_citations[0].amendments == ['An amendment']
@@ -67,7 +67,7 @@ def test_adds_reviews_from_repetition():
     ]
 
     # when
-    actual_citations = resolve_repetitions(citations)
+    actual_citations = extend_citations_with_later_added_info(citations)
 
     # then
     assert actual_citations[0].reviews == ['A review']

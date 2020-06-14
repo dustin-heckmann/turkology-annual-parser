@@ -5,7 +5,7 @@ from typing import Iterable, List, Dict, Tuple
 from domain.citation import Citation, CitationType
 
 
-def resolve_repetitions(citations: Iterable[Citation]):
+def extend_citations_with_later_added_info(citations: Iterable[Citation]):
     citations = list(citations)
     repetitions_by_citation = gather_repetitions_by_citations(citations)
     return add_repeated_info_to_citations(citations, repetitions_by_citation)

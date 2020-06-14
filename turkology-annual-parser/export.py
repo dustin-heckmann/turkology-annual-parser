@@ -1,13 +1,18 @@
+import logging
+import zipfile
 from os import walk, makedirs
 from os.path import join, relpath, dirname, basename
 from typing import List
-
-import zipfile
 from zipfile import ZipFile
 
 ZIP_DIR = '/ta-data'
 ZIP_FILE = 'turkology_annual_export.zip'
 RESOURCES_DIR = '/ta-data/export'
+
+
+def create_export_bundle(dump_file_name: str, zip_path: str):
+    logging.info('Writing export bundle...')
+    create_zip_file([dump_file_name, dump_file_name + 'l'], zip_path)
 
 
 def create_zip_file(dump_file_names: List[str], output_path: str):
