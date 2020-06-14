@@ -14,7 +14,7 @@ from .extract import extract_known_authors
 
 
 def reparse_citations_using_known_authors(citations: List[Citation]):
-    authors = extract_known_authors(citations)
+    authors = extract_known_authors(citations).union(HARDCODED_AUTHORS)
     logging.debug('Found {} distinct authors'.format(len(authors)))
 
     queue = multiprocessing.Manager().Queue()
@@ -102,3 +102,21 @@ def find_single_author(citation: Citation, single_author_pattern) -> Optional[Ci
         remaining_text=remaining_text,
         authors=[parse_name(author_name)]
     )
+
+
+HARDCODED_AUTHORS = {
+    'Condurachi, Em',
+    'Kakük, Z',
+    'Yoman, Yakut',
+    'Kobeneva, T. A',
+    'Djukanovic, Marija',
+    'Zagorka Janc',
+    'Sohbweide, Hanna',
+    'Tübkay, Cevdet',
+    'Eren, ismail',
+    'Baysal,   Jale',
+    'Spiridonakis, B. G',
+    'Uçankuş, Hasan T',
+    'Landau, Jacob M',
+    'Özeğe, Seyfettin',
+}
