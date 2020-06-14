@@ -1,3 +1,5 @@
+from queue import Queue
+
 from bootstrap.authors import insert_known_authors
 from citation.citation_parsing import parse_citation
 from citation.field_parsing import parse_citation_fields
@@ -16,9 +18,10 @@ def test_insert_known_authors():
     ))
     raw_citation = IntermediateCitation(volume=1, raw_text=raw_text)
     parsed_citation = parse_citation_fields(parse_citation(raw_citation))
-    [parsed_citation] = insert_known_authors([parsed_citation], ['Handžić, Adem'])
+    queue = Queue()
+    insert_known_authors([parsed_citation], ['Handžić, Adem'], queue)
 
-    assert parsed_citation == Citation(
+    assert queue.get() == Citation(
         volume=1,
         number=12,
         type=CitationType.ARTICLE,
@@ -46,3 +49,4 @@ def test_insert_known_authors():
         ta_references=[],
         remaining_text='{{{ authors }}} {{{ title }}} {{{ in }}}'
     )
+    assert queue.empty()

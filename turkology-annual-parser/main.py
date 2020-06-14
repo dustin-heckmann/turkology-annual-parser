@@ -39,8 +39,10 @@ def main():
     citations = run_full_pipeline(args.input, args.keyword_file)
 
     if args.find_authors:
+        logging.info('Bootstrapping known authors...')
         citations = reparse_citations_using_known_authors(citations)
     if args.resolve_repetitions:
+        logging.info('Resolving repetitions...')
         citations = resolve_repetitions(citations)
     save_citations(citations, args.output)
     create_export_bundle(args.output, args.zip_output)

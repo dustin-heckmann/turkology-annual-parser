@@ -49,7 +49,7 @@ goal_run() {
   --input "$DATA_DIR"/ocr/* \
   --keyword-file "$DATA_DIR/keywords.csv" \
   --output "$DATA_DIR/ta_citations.json" \
-  --zip-output "$DATA_DIR/turkology_annual_export.zip"
+  --zip-output "$DATA_DIR/turkology_annual_export.zip" -v
 }
 
 ##DOC precommit: run build, lint, typecheck, test
