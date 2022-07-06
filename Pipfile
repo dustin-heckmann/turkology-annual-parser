@@ -11,7 +11,7 @@ flake8 = "~=3.8.3"
 
 [packages]
 nameparser = "~=1.0.6"
-lxml = "~=4.5.1"
+lxml = "~=4.9.1"
 regex = "~=2020.6.8"
 jsonlines = "~=1.2.0"
 
